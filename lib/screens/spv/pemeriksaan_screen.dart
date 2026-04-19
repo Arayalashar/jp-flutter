@@ -23,7 +23,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
   Future<void> _fetchAntrean() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('http://127.0.0.1/JP/api_resi_pengambilan.php');
+      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
       var response = await http.get(url);
       
       if (!mounted) return;
@@ -51,7 +51,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var url = Uri.parse('http://127.0.0.1/JP/api_periksa_barang.php');
+      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},

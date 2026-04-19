@@ -22,7 +22,7 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
   Future<void> _fetchRiwayat() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('http://127.0.0.1/JP/api_riwayat_pemeriksaan.php');
+      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
       var response = await http.get(url);
       
       if (!mounted) return;

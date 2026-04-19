@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    var url = Uri.parse('http://localhost/JP/login_api.php');
+    var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
 
     try {
       var response = await http.post(
