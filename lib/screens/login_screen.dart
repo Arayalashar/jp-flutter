@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = true);
 
-    var url = Uri.parse('https://jpapi.alwaysdata.net/api_laporan.php');
+    var url = Uri.parse('https://jpapi.alwaysdata.net/login_api.php');
 
     try {
       var response = await http.post(
