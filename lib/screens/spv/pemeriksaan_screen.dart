@@ -25,7 +25,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     try {
       var url = Uri.parse('https://jpapi.alwaysdata.net/api_resi_pengambilan.php');
       var response = await http.get(url);
-      
+
       if (!mounted) return;
 
       var data = jsonDecode(response.body);
@@ -46,8 +46,16 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     }
   }
 
-  Future<void> _simpanPemeriksaan(Map item, int bagus, int rusak, String status, String catatan) async {
-    Navigator.pop(context); // Tutup dialog terlebih dahulu
+  // FIX: Semua parameter sekarang diambil langsung dari argumen fungsi ini,
+  // tidak lagi dari variabel yang tidak terdefinisi.
+  Future<void> _simpanPemeriksaan(
+    Map item,
+    int bagus,
+    int rusak,
+    String status,
+    String catatan,
+  ) async {
+    Navigator.pop(context);
     setState(() => _isLoading = true);
 
     try {
@@ -56,14 +64,17 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
+          // FIX: Ambil id_dokumen dan id_barang dari map `item` yang diterima
           "id_dokumen": item['id_dokumen'],
           "id_barang": item['id_barang'],
+          // FIX: Gunakan widget.idSpv (sesuai nama field di widget)
           "id_spv": widget.idSpv,
           "jumlah_diharapkan": item['jumlah_diharapkan'],
+          // FIX: Gunakan parameter bagus, rusak, catatan dari argumen fungsi
           "jumlah_bagus": bagus,
           "jumlah_rusak": rusak,
           "status_pemeriksaan": status,
-          "catatan": catatan
+          "catatan": catatan,
         }),
       );
 
@@ -99,16 +110,16 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     );
   }
 
-  // Desain Pop-up (Dialog) yang lebih modern
   void _showPeriksaDialog(Map item) {
-    TextEditingController bagusCtrl = TextEditingController(text: item['jumlah_diharapkan'].toString());
+    TextEditingController bagusCtrl =
+        TextEditingController(text: item['jumlah_diharapkan'].toString());
     TextEditingController rusakCtrl = TextEditingController(text: "0");
     TextEditingController catatanCtrl = TextEditingController();
     String status = "Lengkap";
 
     showDialog(
       context: context,
-      barrierDismissible: false, // Wajib klik tombol untuk tutup
+      barrierDismissible: false,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
@@ -132,19 +143,27 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                               color: const Color(0xFFF0FDF4),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.fact_check_outlined, color: Color(0xFF166534), size: 24),
+                            child: const Icon(
+                              Icons.fact_check_outlined,
+                              color: Color(0xFF166534),
+                              size: 24,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           const Expanded(
                             child: Text(
                               "Pemeriksaan Fisik",
-                              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w800,
+                                color: Color(0xFF1E293B),
+                              ),
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Info Barang
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -158,12 +177,20 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                           children: [
                             Text(
                               item['nama_barang'],
-                              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Color(0xFF1E293B)),
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFF1E293B),
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               "Tercatat di Resi: ${item['jumlah_diharapkan']} Unit",
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Color(0xFF2563EB)), // Biru untuk jumlah harapan
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF2563EB),
+                              ),
                             ),
                           ],
                         ),
@@ -173,35 +200,58 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                       // Form Inputs
                       Row(
                         children: [
-                          Expanded(child: _buildDialogTextField(controller: bagusCtrl, label: "Jml Bagus")),
+                          Expanded(
+                            child: _buildDialogTextField(
+                              controller: bagusCtrl,
+                              label: "Jml Bagus",
+                            ),
+                          ),
                           const SizedBox(width: 12),
-                          Expanded(child: _buildDialogTextField(controller: rusakCtrl, label: "Jml Rusak")),
+                          Expanded(
+                            child: _buildDialogTextField(
+                              controller: rusakCtrl,
+                              label: "Jml Rusak",
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 16),
-                      
+
                       _buildDialogLabel("Status Keseluruhan"),
                       DropdownButtonFormField<String>(
                         value: status,
-                        icon: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey.shade400),
+                        icon: Icon(
+                          Icons.keyboard_arrow_down_rounded,
+                          color: Colors.grey.shade400,
+                        ),
                         items: ['Lengkap', 'Kurang', 'Rusak']
-                            .map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))))
+                            .map((e) => DropdownMenuItem(
+                                  value: e,
+                                  child: Text(
+                                    e,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ))
                             .toList(),
                         onChanged: (val) => setStateDialog(() => status = val!),
                         decoration: _dialogInputDecoration(),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       _buildDialogLabel("Catatan (Opsional)"),
                       TextField(
                         controller: catatanCtrl,
                         maxLines: 2,
                         style: const TextStyle(fontSize: 14),
-                        decoration: _dialogInputDecoration(hint: "Tulis kendala jika ada..."),
+                        decoration:
+                            _dialogInputDecoration(hint: "Tulis kendala jika ada..."),
                       ),
-                      
+
                       const SizedBox(height: 32),
-                      
+
                       // Buttons
                       Row(
                         children: [
@@ -210,9 +260,17 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                               onPressed: () => Navigator.pop(context),
                               style: TextButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
-                              child: const Text("Batal", style: TextStyle(color: Color(0xFF64748B), fontWeight: FontWeight.w700)),
+                              child: const Text(
+                                "Batal",
+                                style: TextStyle(
+                                  color: Color(0xFF64748B),
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 12),
@@ -222,16 +280,28 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                               onPressed: () {
                                 int bagus = int.tryParse(bagusCtrl.text) ?? 0;
                                 int rusak = int.tryParse(rusakCtrl.text) ?? 0;
-                                _simpanPemeriksaan(item, bagus, rusak, status, catatanCtrl.text);
+                                // FIX: Teruskan semua nilai yang benar ke fungsi simpan
+                                _simpanPemeriksaan(
+                                  item,
+                                  bagus,
+                                  rusak,
+                                  status,
+                                  catatanCtrl.text,
+                                );
                               },
                               style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFF166534), // Hijau Utama
+                                backgroundColor: const Color(0xFF166534),
                                 foregroundColor: Colors.white,
                                 elevation: 0,
                                 padding: const EdgeInsets.symmetric(vertical: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
                               ),
-                              child: const Text("Simpan Hasil", style: TextStyle(fontWeight: FontWeight.w700)),
+                              child: const Text(
+                                "Simpan Hasil",
+                                style: TextStyle(fontWeight: FontWeight.w700),
+                              ),
                             ),
                           ),
                         ],
@@ -247,18 +317,24 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     );
   }
 
-  // Helper UI untuk isi Dialog
   Widget _buildDialogLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         text,
-        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF475569)),
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Color(0xFF475569),
+        ),
       ),
     );
   }
 
-  Widget _buildDialogTextField({required TextEditingController controller, required String label}) {
+  Widget _buildDialogTextField({
+    required TextEditingController controller,
+    required String label,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -281,23 +357,32 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
       filled: true,
       fillColor: const Color(0xFFF8FAFC),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF166534), width: 1.5)),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF166534), width: 1.5),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // Slate 50
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         title: const Text(
           "Antrean Pemeriksaan",
           style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, letterSpacing: 0.2),
         ),
         centerTitle: true,
-        backgroundColor: const Color(0xFF166534), // Hijau Utama
+        backgroundColor: const Color(0xFF166534),
         foregroundColor: Colors.white,
         elevation: 0,
         shape: const RoundedRectangleBorder(
@@ -312,7 +397,9 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
               child: _listAntrean.isEmpty
                   ? _buildEmptyState()
                   : ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                       itemCount: _listAntrean.length,
                       itemBuilder: (context, index) {
@@ -337,7 +424,11 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
             const SizedBox(height: 16),
             Text(
               'Belum ada barang datang.',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey.shade600,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
@@ -368,19 +459,29 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header Card
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(color: const Color(0xFFF0FDF4), borderRadius: BorderRadius.circular(8)),
-                child: const Icon(Icons.qr_code_scanner_rounded, size: 20, color: Color(0xFF166534)),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF0FDF4),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.qr_code_scanner_rounded,
+                  size: 20,
+                  color: Color(0xFF166534),
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   item['nomor_dokumen'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: Color(0xFF1E293B)),
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF1E293B),
+                  ),
                 ),
               ),
             ],
@@ -389,38 +490,50 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
             padding: EdgeInsets.symmetric(vertical: 14),
             child: Divider(height: 1, color: Color(0xFFF1F5F9)),
           ),
-          
-          // Konten Info
           _buildInfoRow(Icons.inventory_2_outlined, "Barang:", item['nama_barang']),
           const SizedBox(height: 8),
-          _buildInfoRow(Icons.tag_rounded, "Jumlah di Resi:", "${item['jumlah_diharapkan']} Unit", isHighlight: true),
+          _buildInfoRow(
+            Icons.tag_rounded,
+            "Jumlah di Resi:",
+            "${item['jumlah_diharapkan']} Unit",
+            isHighlight: true,
+          ),
           const SizedBox(height: 8),
-          _buildInfoRow(Icons.local_shipping_outlined, "Supir Pengantar:", item['supir'] ?? '-'),
-          
+          _buildInfoRow(
+            Icons.local_shipping_outlined,
+            "Supir Pengantar:",
+            item['supir'] ?? '-',
+          ),
           const SizedBox(height: 20),
-          
-          // Tombol Aksi
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () => _showPeriksaDialog(item),
               icon: const Icon(Icons.fact_check_outlined, color: Colors.white, size: 20),
-              label: const Text("Periksa Fisik", style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.5)),
+              label: const Text(
+                "Periksa Fisik",
+                style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.5),
+              ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF166534), // Hijau Navagreen
+                backgroundColor: const Color(0xFF166534),
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 elevation: 0,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value, {bool isHighlight = false}) {
+  Widget _buildInfoRow(
+    IconData icon,
+    String label,
+    String value, {
+    bool isHighlight = false,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -431,14 +544,18 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
         const SizedBox(width: 8),
         Text(
           "$label ",
-          style: const TextStyle(fontSize: 13, color: Color(0xFF64748B), fontWeight: FontWeight.w500),
+          style: const TextStyle(
+            fontSize: 13,
+            color: Color(0xFF64748B),
+            fontWeight: FontWeight.w500,
+          ),
         ),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
-              fontSize: 13, 
-              color: isHighlight ? const Color(0xFF2563EB) : const Color(0xFF1E293B), 
+              fontSize: 13,
+              color: isHighlight ? const Color(0xFF2563EB) : const Color(0xFF1E293B),
               fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w600,
             ),
           ),
