@@ -51,7 +51,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var url = Uri.parse('https://jpapi.alwaysdata.net/api_resi_pengambilan.php');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_periksa_barang.php');
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
