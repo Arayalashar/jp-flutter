@@ -23,7 +23,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
   Future<void> _fetchAntrean() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('https://jpapi.alwaysdata.net/api_periksa_barang.php');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_resi_pengambilan.php');
       var response = await http.get(url);
       
       if (!mounted) return;
@@ -72,7 +72,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
       var data = jsonDecode(response.body);
       if (data['status'] == 'success') {
         _showSnackBar(data['message'], isError: false);
-        _fetchAntrean(); // Refresh list setelah sukses
+        _fetchAntrean();
       } else {
         _showSnackBar(data['message'], isError: true);
         setState(() => _isLoading = false);
