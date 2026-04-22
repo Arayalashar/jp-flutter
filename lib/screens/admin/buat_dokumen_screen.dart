@@ -37,7 +37,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
 
   Future<void> _fetchMasterData() async {
     try {
-      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
+      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_master_data.php');
       var response = await http.get(url);
       
       if (!mounted) return;
@@ -74,7 +74,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
+      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_buat_dokumen.php');
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},

@@ -23,7 +23,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
   Future<void> _fetchLaporan() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('apiptjakhipasaribawa.lovestoblog.com');
+      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_laporan.php');
       var response = await http.get(url);
       
       if (!mounted) return;
