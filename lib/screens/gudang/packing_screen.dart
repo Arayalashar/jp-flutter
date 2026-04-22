@@ -23,7 +23,7 @@ class _PackingScreenState extends State<PackingScreen> {
   Future<void> _fetchTugasPacking() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_selesai_packing.php');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_selesai_packing.php');
       var response = await http.get(url);
       
       if (!mounted) return;
@@ -50,7 +50,7 @@ class _PackingScreenState extends State<PackingScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_tugas_gudang.php');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_tugas_gudang.php');
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},

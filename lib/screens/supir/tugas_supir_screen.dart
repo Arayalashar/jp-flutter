@@ -25,7 +25,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
   Future<void> _fetchTugas() async {
     setState(() => _isLoading = true);
     try {
-      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_tugas_supir.php?id_supir=${widget.idSupir}');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_tugas_supir.php?id_supir=${widget.idSupir}');
       var response = await http.get(url);
       
       if (!mounted) return;
@@ -54,7 +54,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
     setState(() => _isLoading = true);
 
     try {
-      var url = Uri.parse('https://apiptjakhipasaribawa.lovestoblog.com/api_update_status.php');
+      var url = Uri.parse('https://jpapi.alwaysdata.net/api_update_status.php');
       var response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
