@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/admin_provider.dart';
 import '../../../shared/theme/app_theme.dart';
 import '../../../shared/widgets/status_badge.dart';
@@ -63,18 +64,22 @@ class _LaporanScreenState extends State<LaporanScreen> {
           return RefreshIndicator(
             onRefresh: () => provider.fetchLaporan('Semua'),
             color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
               slivers: [
-                // Stats bar
+                // Stats bar — dark surface
                 SliverToBoxAdapter(
                   child: Container(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-                    decoration: const BoxDecoration(
-                      color: AppColors.primaryDeep,
-                      borderRadius: BorderRadius.only(
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: const BorderRadius.only(
                         bottomLeft: Radius.circular(24),
                         bottomRight: Radius.circular(24),
+                      ),
+                      border: Border(
+                        bottom: BorderSide(color: AppColors.borderLight),
                       ),
                     ),
                     child: Row(
@@ -82,22 +87,22 @@ class _LaporanScreenState extends State<LaporanScreen> {
                         StatCardCompact(
                           label: 'Total',
                           value: summary['total'].toString(),
-                          bgColor: Colors.white,
-                          textColor: AppColors.primaryDeep,
+                          bgColor: AppColors.primary,
+                          textColor: AppColors.textOnPrimary,
                         ),
                         const SizedBox(width: 10),
                         StatCardCompact(
                           label: 'Selesai',
                           value: summary['selesai'].toString(),
-                          bgColor: Colors.white.withValues(alpha: 0.15),
-                          textColor: Colors.white,
+                          bgColor: AppColors.surfaceVariant,
+                          textColor: AppColors.textPrimary,
                         ),
                         const SizedBox(width: 10),
                         StatCardCompact(
                           label: 'Kendala',
                           value: summary['gagal'].toString(),
-                          bgColor: Colors.white.withValues(alpha: 0.15),
-                          textColor: Colors.white,
+                          bgColor: AppColors.surfaceVariant,
+                          textColor: AppColors.textPrimary,
                         ),
                       ],
                     ),
@@ -122,12 +127,12 @@ class _LaporanScreenState extends State<LaporanScreen> {
                             label: Text(f),
                             selected: isSelected,
                             onSelected: (_) => setState(() => _selectedFilter = f),
-                            selectedColor: AppColors.primarySurface,
+                            selectedColor: AppColors.primary.withValues(alpha: 0.15),
                             backgroundColor: AppColors.surfaceVariant,
                             labelStyle: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? AppColors.primaryDark : AppColors.textTertiary,
+                              color: isSelected ? AppColors.primary : AppColors.textTertiary,
                             ),
                             side: BorderSide(
                               color: isSelected ? AppColors.primary.withValues(alpha: 0.3) : Colors.transparent,
@@ -154,7 +159,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
                         final doc = filtered[index];
-                        return _buildDocCard(doc);
+                        return _buildDocCard(doc)
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 60))
+                            .slideY(begin: 0.03, end: 0, duration: 400.ms);
                       },
                       childCount: filtered.length,
                     ),
@@ -174,11 +182,7 @@ class _LaporanScreenState extends State<LaporanScreen> {
     return Container(
       margin: const EdgeInsets.fromLTRB(20, 12, 20, 0),
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.soft,
-      ),
+      decoration: AppGlass.elevatedCard(radius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -202,10 +206,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: AppColors.primarySurface,
+                    color: AppColors.primary.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(AppRadius.sm),
                   ),
-                  child: const Icon(Icons.print_rounded, size: 18, color: AppColors.primaryDark),
+                  child: Icon(Icons.print_rounded, size: 18, color: AppColors.primary),
                 ),
               ),
             ],

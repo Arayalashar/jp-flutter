@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../features/auth/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -14,6 +15,7 @@ import '../../features/supir/screens/tugas_supir_screen.dart';
 import '../theme/app_theme.dart';
 import '../widgets/stat_card.dart';
 import '../widgets/section_header.dart';
+import '../widgets/animated_background.dart';
 
 // Network
 import '../../core/network/api_client.dart';
@@ -78,9 +80,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-        title: const Text("Keluar Aplikasi", style: TextStyle(fontWeight: FontWeight.w800)),
-        content: const Text("Apakah Anda yakin ingin keluar dari akun ini?"),
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: AppColors.border),
+        ),
+        title: const Text("Keluar Aplikasi", style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+        content: const Text("Apakah Anda yakin ingin keluar dari akun ini?", style: TextStyle(color: AppColors.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -126,16 +132,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         children: tabs,
       ),
       bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.06),
-              blurRadius: 20,
-              offset: const Offset(0, -4),
-            ),
-          ],
-        ),
+        decoration: AppGlass.navbar(),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -216,65 +213,63 @@ class _DashboardScreenState extends State<DashboardScreen> {
   // HOME TAB — Universal Dashboard
   // ============================================================
   Widget _buildHomeTab() {
-    return RefreshIndicator(
-      onRefresh: _fetchStats,
-      color: AppColors.primary,
-      child: CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-        slivers: [
-          // Header
-          SliverToBoxAdapter(child: _buildHeader()),
-          // Stats
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-              child: _statsLoading
-                  ? const Center(child: Padding(
-                      padding: EdgeInsets.all(32),
-                      child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
-                    ))
-                  : _buildStatsGrid(),
-            ),
-          ),
-          // Quick Actions
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-              child: Column(
-                children: [
-                  const SectionHeader(title: 'Aksi Cepat', icon: Icons.bolt_rounded),
-                  _buildQuickActions(),
-                ],
+    return AnimatedBackground(
+      child: RefreshIndicator(
+        onRefresh: _fetchStats,
+        color: AppColors.primary,
+        backgroundColor: AppColors.surface,
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          slivers: [
+            // Header
+            SliverToBoxAdapter(child: _buildHeader()),
+            // Stats
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
+                child: _statsLoading
+                    ? const Center(child: Padding(
+                        padding: EdgeInsets.all(32),
+                        child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
+                      ))
+                    : _buildStatsGrid(),
               ),
             ),
-          ),
-          // Spacer
-          const SliverToBoxAdapter(child: SizedBox(height: 100)),
-        ],
+            // Quick Actions
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: Column(
+                  children: [
+                    const SectionHeader(title: 'Aksi Cepat', icon: Icons.bolt_rounded),
+                    _buildQuickActions(),
+                  ],
+                ),
+              ),
+            ),
+            // Spacer
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
+          ],
+        ),
       ),
     );
   }
 
   // ============================================================
-  // HEADER CARD
+  // HEADER CARD — Dark gradient
   // ============================================================
   Widget _buildHeader() {
     final roleLabel = _getRoleLabel();
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 56, 24, 28),
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF064E3B), // Emerald 900
-            Color(0xFF065F46), // Emerald 800
-            Color(0xFF047857), // Emerald 700
-          ],
-        ),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        gradient: AppGradients.header,
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
+        ),
+        border: Border(
+          bottom: BorderSide(color: AppColors.border.withValues(alpha: 0.3)),
         ),
       ),
       child: Column(
@@ -290,15 +285,24 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     padding: const EdgeInsets.all(2),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 2),
+                      border: Border.all(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          blurRadius: 12,
+                        ),
+                      ],
                     ),
                     child: CircleAvatar(
                       radius: 22,
-                      backgroundColor: Colors.white.withValues(alpha: 0.15),
+                      backgroundColor: AppColors.surfaceVariant,
                       child: Text(
                         widget.nama.isNotEmpty ? widget.nama[0].toUpperCase() : 'U',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: AppColors.primary,
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
                         ),
@@ -312,22 +316,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Text(
                         'Halo, ${widget.nama.split(' ').first}! 👋',
                         style: const TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.15),
+                          color: AppColors.primary.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(AppRadius.full),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.2),
+                          ),
                         ),
                         child: Text(
                           roleLabel,
                           style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: AppColors.primary,
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
                             letterSpacing: 0.5,
@@ -340,14 +347,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               // Logout button
               Material(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: AppColors.surfaceVariant,
                 borderRadius: BorderRadius.circular(AppRadius.md),
                 child: InkWell(
                   onTap: () => _logout(context),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   child: const Padding(
                     padding: EdgeInsets.all(10),
-                    child: Icon(Icons.logout_rounded, color: Colors.white, size: 22),
+                    child: Icon(Icons.logout_rounded, color: AppColors.textTertiary, size: 22),
                   ),
                 ),
               ),
@@ -355,7 +362,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0, duration: 400.ms);
   }
 
   String _getRoleLabel() {
@@ -422,12 +429,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
               label: 'Dalam Perjalanan',
               value: '${_stats['dalam_perjalanan'] ?? 0}',
               icon: Icons.local_shipping_outlined,
-              iconColor: const Color(0xFF6366F1),
+              iconColor: const Color(0xFF818CF8),
             )),
           ],
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms, delay: 200.ms);
   }
 
   Widget _buildGudangStats() {
@@ -454,7 +461,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           iconColor: AppColors.info,
         )),
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms, delay: 200.ms);
   }
 
   Widget _buildSupirStats() {
@@ -481,7 +488,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           iconColor: AppColors.info,
         )),
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms, delay: 200.ms);
   }
 
   Widget _buildSpvStats() {
@@ -508,7 +515,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           iconColor: AppColors.info,
         )),
       ],
-    );
+    ).animate().fadeIn(duration: 500.ms, delay: 200.ms);
   }
 
   // ============================================================
@@ -526,7 +533,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       mainAxisSpacing: 12,
       childAspectRatio: 1.15,
       children: actions,
-    );
+    ).animate().fadeIn(duration: 500.ms, delay: 400.ms);
   }
 
   List<Widget> _getQuickActions(String role) {
@@ -548,7 +555,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
           _buildActionCard(
             icon: Icons.history_rounded,
             label: 'Riwayat\nSPV',
-            color: const Color(0xFF8B5CF6),
+            color: const Color(0xFF818CF8),
             onTap: () => setState(() => _currentIndex = 2),
           ),
         ];
@@ -613,19 +620,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppRadius.lg),
+        splashColor: color.withValues(alpha: 0.05),
         child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-            boxShadow: AppShadows.soft,
-          ),
+          decoration: AppGlass.elevatedCard(radius: AppRadius.lg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
+                  color: color.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                 ),
                 child: Icon(icon, color: color, size: 24),

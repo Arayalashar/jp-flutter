@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/supir_provider.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/status_badge.dart';
@@ -38,7 +39,12 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
               backgroundColor: AppColors.surface,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: Padding(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                    border: Border.all(color: AppColors.border),
+                  ),
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -49,10 +55,10 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primarySurface,
+                              color: AppColors.primary.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(AppRadius.md),
                             ),
-                            child: const Icon(Icons.local_shipping_outlined, color: AppColors.primaryDark, size: 24),
+                            child: Icon(Icons.local_shipping_outlined, color: AppColors.primary, size: 24),
                           ),
                           const SizedBox(width: 14),
                           const Expanded(
@@ -69,6 +75,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: AppColors.borderLight),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -85,6 +92,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: selectedStatus,
+                        dropdownColor: AppColors.surface,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textTertiary),
                         items: ['Dalam Perjalanan', 'Sampai Tujuan', 'Gagal Kirim']
                             .map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))))
@@ -99,7 +107,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                       TextField(
                         controller: ketController,
                         maxLines: 2,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
                         decoration: const InputDecoration(hintText: "Nama Penerima / Alasan Gagal..."),
                       ),
                       const SizedBox(height: 28),
@@ -178,6 +186,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
           return RefreshIndicator(
             onRefresh: () => provider.fetchTugas(widget.idSupir),
             color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             child: provider.tugasList.isEmpty
                 ? const EmptyStateWidget(
                     icon: Icons.local_shipping_outlined,
@@ -188,7 +197,10 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     itemCount: provider.tugasList.length,
-                    itemBuilder: (context, index) => _buildTugasCard(provider.tugasList[index]),
+                    itemBuilder: (context, index) => _buildTugasCard(provider.tugasList[index])
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
+                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
                   ),
           );
         },
@@ -208,12 +220,13 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isSelesai ? AppColors.primarySurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: isSelesai ? AppColors.primaryMuted : Colors.transparent),
-        boxShadow: isSelesai ? null : AppShadows.soft,
-      ),
+      decoration: isSelesai
+          ? BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.success.withValues(alpha: 0.15)),
+            )
+          : AppGlass.elevatedCard(radius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -254,10 +267,15 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           decoration: BoxDecoration(
                             color: done ? AppColors.primary : AppColors.surfaceVariant,
                             shape: BoxShape.circle,
-                            border: isCurrent ? Border.all(color: AppColors.primaryLight, width: 2) : null,
+                            border: isCurrent
+                                ? Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 2)
+                                : null,
+                            boxShadow: isCurrent
+                                ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8)]
+                                : null,
                           ),
                           child: done
-                              ? const Icon(Icons.check, size: 14, color: Colors.white)
+                              ? Icon(Icons.check, size: 14, color: AppColors.textOnPrimary)
                               : null,
                         ),
                         const SizedBox(height: 4),
@@ -277,7 +295,10 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                         child: Container(
                           height: 2,
                           margin: const EdgeInsets.only(bottom: 20),
-                          color: i < currentStepIndex ? AppColors.primary : AppColors.border,
+                          decoration: BoxDecoration(
+                            color: i < currentStepIndex ? AppColors.primary : AppColors.border,
+                            borderRadius: BorderRadius.circular(1),
+                          ),
                         ),
                       ),
                   ],
@@ -309,7 +330,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
       children: [
         Padding(padding: const EdgeInsets.only(top: 2), child: Icon(icon, size: 16, color: AppColors.textTertiary)),
         const SizedBox(width: 8),
-        Text("$label ", style: TextStyle(fontSize: 13, color: isSelesai ? AppColors.textTertiary : AppColors.textTertiary, fontWeight: FontWeight.w500)),
+        Text("$label ", style: TextStyle(fontSize: 13, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
         Expanded(
           child: Text(
             value,

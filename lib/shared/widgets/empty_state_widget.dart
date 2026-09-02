@@ -28,6 +28,10 @@ class EmptyStateWidget extends StatelessWidget {
               decoration: BoxDecoration(
                 color: AppColors.surfaceVariant,
                 shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.border,
+                  width: 1,
+                ),
               ),
               child: Icon(icon, size: 48, color: AppColors.textTertiary),
             ),

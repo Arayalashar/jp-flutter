@@ -22,22 +22,17 @@ class StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final effectiveIconColor = iconColor ?? AppColors.primary;
-    final effectiveBg = bgColor ?? AppColors.surface;
 
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: effectiveBg,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: effectiveBg == AppColors.surface ? AppShadows.soft : null,
-      ),
+      decoration: AppGlass.elevatedCard(radius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: effectiveIconColor.withValues(alpha: 0.1),
+              color: effectiveIconColor.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(AppRadius.sm),
             ),
             child: Icon(icon, size: 20, color: effectiveIconColor),
@@ -90,6 +85,10 @@ class StatCardCompact extends StatelessWidget {
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.circular(AppRadius.base),
+          border: Border.all(
+            color: textColor.withValues(alpha: 0.1),
+            width: 0.5,
+          ),
         ),
         child: Column(
           children: [

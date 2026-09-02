@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/gudang_provider.dart';
 import '../models/gudang_model.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
@@ -28,20 +29,24 @@ class _PackingScreenState extends State<PackingScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          side: BorderSide(color: AppColors.border),
+        ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primarySurface,
+                color: AppColors.primary.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(AppRadius.sm),
               ),
-              child: const Icon(Icons.check_box_outlined, color: AppColors.primaryDark, size: 20),
+              child: Icon(Icons.check_box_outlined, color: AppColors.primary, size: 20),
             ),
             const SizedBox(width: 12),
             const Expanded(
-              child: Text("Konfirmasi Packing", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+              child: Text("Konfirmasi Packing", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.textPrimary)),
             ),
           ],
         ),
@@ -105,6 +110,7 @@ class _PackingScreenState extends State<PackingScreen> {
           return RefreshIndicator(
             onRefresh: () => provider.fetchTugas(),
             color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             child: provider.tugasList.isEmpty
                 ? const EmptyStateWidget(
                     icon: Icons.inventory_2_outlined,
@@ -115,7 +121,10 @@ class _PackingScreenState extends State<PackingScreen> {
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     itemCount: provider.tugasList.length,
-                    itemBuilder: (context, index) => _buildPackingCard(provider.tugasList[index]),
+                    itemBuilder: (context, index) => _buildPackingCard(provider.tugasList[index])
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
+                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
                   ),
           );
         },
@@ -133,15 +142,13 @@ class _PackingScreenState extends State<PackingScreen> {
       duration: const Duration(milliseconds: 300),
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDone ? AppColors.primarySurface : AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(
-          color: isDone ? AppColors.primaryMuted : Colors.transparent,
-          width: 1,
-        ),
-        boxShadow: isDone ? null : AppShadows.soft,
-      ),
+      decoration: isDone
+          ? BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(color: AppColors.success.withValues(alpha: 0.15)),
+            )
+          : AppGlass.elevatedCard(radius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -185,6 +192,7 @@ class _PackingScreenState extends State<PackingScreen> {
               ),
               style: ElevatedButton.styleFrom(
                 backgroundColor: isDone ? AppColors.success : AppColors.primary,
+                foregroundColor: isDone ? Colors.white : AppColors.textOnPrimary,
                 disabledBackgroundColor: AppColors.success.withValues(alpha: 0.7),
                 disabledForegroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -202,10 +210,10 @@ class _PackingScreenState extends State<PackingScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 16, color: isDone ? AppColors.textTertiary : AppColors.textTertiary),
+          child: Icon(icon, size: 16, color: AppColors.textTertiary),
         ),
         const SizedBox(width: 8),
-        Text("$label ", style: TextStyle(fontSize: 13, color: isDone ? AppColors.textTertiary : AppColors.textTertiary, fontWeight: FontWeight.w500)),
+        Text("$label ", style: TextStyle(fontSize: 13, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
         Expanded(
           child: Text(
             value,

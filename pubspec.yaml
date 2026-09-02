@@ -40,6 +40,8 @@ dependencies:
   google_fonts: ^8.2.1
   pdf: ^3.13.0
   printing: ^5.15.0
+  flutter_animate: ^4.5.2
+  shimmer: ^3.0.0
 
 dev_dependencies:
   flutter_test:

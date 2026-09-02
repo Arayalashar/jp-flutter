@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/spv_provider.dart';
 import '../models/antrean_model.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
@@ -40,7 +41,12 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
               backgroundColor: AppColors.surface,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                child: Padding(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(AppRadius.xl),
+                    border: Border.all(color: AppColors.border),
+                  ),
                   padding: const EdgeInsets.all(24),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -51,10 +57,10 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primarySurface,
+                              color: AppColors.primary.withValues(alpha: 0.12),
                               borderRadius: BorderRadius.circular(AppRadius.md),
                             ),
-                            child: const Icon(Icons.fact_check_outlined, color: AppColors.primaryDark, size: 24),
+                            child: Icon(Icons.fact_check_outlined, color: AppColors.primary, size: 24),
                           ),
                           const SizedBox(width: 14),
                           const Expanded(
@@ -70,6 +76,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.surfaceVariant,
                           borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: AppColors.borderLight),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,6 +115,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: status,
+                        dropdownColor: AppColors.surface,
                         icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textTertiary),
                         items: ['Lengkap', 'Kurang', 'Rusak']
                             .map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))))
@@ -122,7 +130,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                       TextField(
                         controller: catatanCtrl,
                         maxLines: 2,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
                         decoration: const InputDecoration(hintText: "Tulis kendala jika ada..."),
                       ),
                       const SizedBox(height: 28),
@@ -253,6 +261,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
           return RefreshIndicator(
             onRefresh: () => provider.fetchAntrean(),
             color: AppColors.primary,
+            backgroundColor: AppColors.surface,
             child: provider.antreanList.isEmpty
                 ? const EmptyStateWidget(
                     icon: Icons.inventory_2_outlined,
@@ -263,7 +272,10 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                     physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
                     itemCount: provider.antreanList.length,
-                    itemBuilder: (context, index) => _buildAntreanCard(provider.antreanList[index]),
+                    itemBuilder: (context, index) => _buildAntreanCard(provider.antreanList[index])
+                        .animate()
+                        .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
+                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
                   ),
           );
         },
@@ -275,11 +287,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: AppShadows.soft,
-      ),
+      decoration: AppGlass.elevatedCard(radius: AppRadius.lg),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -288,10 +296,10 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
-                child: const Icon(Icons.qr_code_scanner_rounded, size: 20, color: AppColors.primaryDark),
+                child: Icon(Icons.qr_code_scanner_rounded, size: 20, color: AppColors.primary),
               ),
               const SizedBox(width: 12),
               Expanded(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import '../providers/auth_provider.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
+import '../../../shared/widgets/animated_background.dart';
 import '../../../shared/screens/dashboard_screen.dart';
 import '../../../shared/theme/app_theme.dart';
 
@@ -84,21 +86,12 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
     final isLoading = context.watch<AuthProvider>().isLoading;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF0F172A), // Slate 900
-              Color(0xFF064E3B), // Emerald 900
-              Color(0xFF0F172A), // Slate 900
-            ],
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
+      body: AnimatedBackground(
+        orbColors: const [
+          Color(0xFF1A3A2A),
+          Color(0xFF0F2A1F),
+          Color(0xFF162035),
+        ],
         child: SafeArea(
           child: Center(
             child: SingleChildScrollView(
@@ -111,13 +104,23 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Logo
+                      // Logo with neon glow
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surface,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 2),
+                          border: Border.all(
+                            color: AppColors.primary.withValues(alpha: 0.25),
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primary.withValues(alpha: 0.12),
+                              blurRadius: 24,
+                              spreadRadius: 2,
+                            ),
+                          ],
                         ),
                         child: Image.asset(
                           'assets/images/logo.png',
@@ -129,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       Text(
                         "PT JAKHI PASARIBAWA",
                         style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
+                          color: AppColors.textTertiary,
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 4.0,
@@ -139,7 +142,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       const Text(
                         "Logistik Navagreen",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: AppColors.textPrimary,
                           fontSize: 26,
                           fontWeight: FontWeight.w800,
                           letterSpacing: 0.5,
@@ -147,85 +150,107 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                       ),
                       const SizedBox(height: 48),
 
-                      // Login card
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(AppRadius.xxl),
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(28),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.08),
-                              borderRadius: BorderRadius.circular(AppRadius.xxl),
-                              border: Border.all(color: Colors.white.withValues(alpha: 0.15), width: 1),
+                      // Login card — dark glass
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(28),
+                        decoration: AppGlass.elevatedCard(radius: AppRadius.xxl),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Selamat Datang",
+                              style: TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 22,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Selamat Datang",
-                                  style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w700),
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  "Masuk untuk mengakses sistem",
-                                  style: TextStyle(
-                                    color: Colors.white.withValues(alpha: 0.5),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Masuk untuk mengakses sistem",
+                              style: TextStyle(
+                                color: AppColors.textTertiary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 28),
 
-                                _buildTextField(
-                                  controller: _usernameController,
-                                  hint: "Username",
-                                  icon: Icons.person_outline_rounded,
-                                ),
-                                const SizedBox(height: 16),
-                                _buildTextField(
-                                  controller: _passwordController,
-                                  hint: "Password",
-                                  icon: Icons.lock_outline_rounded,
-                                  isPassword: true,
-                                ),
-                                const SizedBox(height: 32),
+                            _buildTextField(
+                              controller: _usernameController,
+                              hint: "Username",
+                              icon: Icons.person_outline_rounded,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _passwordController,
+                              hint: "Password",
+                              icon: Icons.lock_outline_rounded,
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 32),
 
-                                SizedBox(
-                                  width: double.infinity,
-                                  height: 54,
-                                  child: ElevatedButton(
-                                    onPressed: isLoading ? null : _login,
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: AppColors.primary,
-                                      foregroundColor: Colors.white,
-                                      elevation: 0,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(AppRadius.base),
-                                      ),
-                                    ),
-                                    child: isLoading
-                                        ? const SizedBox(
-                                            height: 22, width: 22,
-                                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                                          )
-                                        : const Text(
-                                            "Masuk Sekarang",
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, letterSpacing: 0.5),
+                            // Login button — neon green gradient
+                            SizedBox(
+                              width: double.infinity,
+                              height: 54,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  gradient: isLoading ? null : AppGradients.accent,
+                                  borderRadius: BorderRadius.circular(AppRadius.base),
+                                  color: isLoading ? AppColors.surfaceVariant : null,
+                                  boxShadow: isLoading
+                                      ? null
+                                      : [
+                                          BoxShadow(
+                                            color: AppColors.primary.withValues(alpha: 0.3),
+                                            blurRadius: 16,
+                                            offset: const Offset(0, 4),
                                           ),
-                                  ),
+                                        ],
                                 ),
-                              ],
+                                child: ElevatedButton(
+                                  onPressed: isLoading ? null : _login,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    foregroundColor: AppColors.textOnPrimary,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(AppRadius.base),
+                                    ),
+                                  ),
+                                  child: isLoading
+                                      ? const SizedBox(
+                                          height: 22,
+                                          width: 22,
+                                          child: CircularProgressIndicator(
+                                            color: AppColors.textTertiary,
+                                            strokeWidth: 2.5,
+                                          ),
+                                        )
+                                      : const Text(
+                                          "Masuk Sekarang",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                ),
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
 
                       const SizedBox(height: 40),
                       Text(
                         "© 2026 PT Jakhi Pasaribawa",
-                        style: TextStyle(color: Colors.white.withValues(alpha: 0.3), fontSize: 11),
+                        style: TextStyle(
+                          color: AppColors.textTertiary.withValues(alpha: 0.5),
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),
@@ -246,24 +271,24 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Colors.white.withValues(alpha: 0.04),
         borderRadius: BorderRadius.circular(AppRadius.base),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword ? _obscurePassword : false,
-        style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w500),
-        cursorColor: AppColors.primaryLight,
+        style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w500),
+        cursorColor: AppColors.primary,
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.35), fontSize: 14),
-          prefixIcon: Icon(icon, color: Colors.white.withValues(alpha: 0.5), size: 20),
+          hintStyle: TextStyle(color: AppColors.textTertiary, fontSize: 14),
+          prefixIcon: Icon(icon, color: AppColors.textTertiary, size: 20),
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
                     _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                    color: Colors.white.withValues(alpha: 0.5),
+                    color: AppColors.textTertiary,
                     size: 20,
                   ),
                   onPressed: () => setState(() => _obscurePassword = !_obscurePassword),

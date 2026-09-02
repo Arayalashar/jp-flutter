@@ -39,14 +39,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color(0xFF064E3B),
-              Color(0xFF065F46),
-            ],
-          ),
+          gradient: AppGradients.background,
         ),
         child: Stack(
           children: [
@@ -59,12 +52,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Image.asset(
                 'assets/images/truck_2d.jpg',
                 fit: BoxFit.cover,
-                color: Colors.black.withValues(alpha: 0.3),
+                color: Colors.black.withValues(alpha: 0.55),
                 colorBlendMode: BlendMode.darken,
               ),
             ),
 
-            // Gradient overlay
+            // Gradient overlay — dark bottom fade
             Positioned(
               top: MediaQuery.of(context).size.height * 0.3,
               left: 0,
@@ -77,7 +70,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Colors.transparent,
-                      Color(0xFF065F46),
+                      Color(0xFF0D1320),
                     ],
                   ),
                 ),
@@ -97,7 +90,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     const Text(
                       "Distribusi Lebih\nCerdas & Cepat",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: AppColors.textPrimary,
                         fontSize: 34,
                         height: 1.1,
                         fontWeight: FontWeight.w900,
@@ -108,7 +101,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     Text(
                       "Kelola pengiriman barang, pantau status\nrealtime, dan tingkatkan efisiensi logistik.",
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.7),
+                        color: AppColors.textSecondary,
                         fontSize: 15,
                         fontWeight: FontWeight.w500,
                         height: 1.5,
@@ -116,7 +109,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     ),
                     const SizedBox(height: 48),
 
-                    // Swipe button
+                    // Swipe button — dark glass track
                     LayoutBuilder(
                       builder: (context, constraints) {
                         double buttonWidth = constraints.maxWidth;
@@ -126,9 +119,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         return Container(
                           height: thumbSize,
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: AppColors.surfaceVariant.withValues(alpha: 0.5),
                             borderRadius: BorderRadius.circular(thumbSize / 2),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                            border: Border.all(color: AppColors.border),
                           ),
                           child: Stack(
                             children: [
@@ -138,7 +131,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 width: _dragPosition + thumbSize,
                                 height: thumbSize,
                                 decoration: BoxDecoration(
-                                  color: AppColors.primary.withValues(alpha: 0.3),
+                                  color: AppColors.primary.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(thumbSize / 2),
                                 ),
                               ),
@@ -148,7 +141,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 child: Text(
                                   "Geser untuk mulai  >>>",
                                   style: TextStyle(
-                                    color: Colors.white.withValues(
+                                    color: AppColors.textTertiary.withValues(
                                       alpha: (1 - (_dragPosition / maxDrag)).clamp(0.3, 1.0),
                                     ),
                                     fontSize: 15,
@@ -157,7 +150,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   ),
                                 ),
                               ),
-                              // Thumb
+                              // Thumb — neon green
                               Positioned(
                                 left: _dragPosition,
                                 child: GestureDetector(
@@ -180,21 +173,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     width: thumbSize,
                                     height: thumbSize,
                                     decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [AppColors.primary, Color(0xFF34D399)],
-                                      ),
+                                      gradient: AppGradients.accent,
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: AppColors.primary.withValues(alpha: 0.4),
+                                          color: AppColors.primary.withValues(alpha: 0.35),
                                           blurRadius: 16,
                                           offset: const Offset(0, 4),
                                         ),
                                       ],
                                     ),
-                                    child: const Icon(
+                                    child: Icon(
                                       Icons.local_shipping_rounded,
-                                      color: Colors.white,
+                                      color: AppColors.textOnPrimary,
                                       size: 26,
                                     ),
                                   ),

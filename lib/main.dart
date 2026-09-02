@@ -32,7 +32,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Distribusi Jakhi',
-      theme: AppTheme.lightTheme,
+      theme: AppTheme.darkGlassTheme,
       home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );

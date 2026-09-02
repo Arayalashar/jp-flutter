@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/admin_provider.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/theme/app_theme.dart';
@@ -137,7 +138,10 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
     final steps = ['Informasi', 'Penugasan', 'Konfirmasi'];
     return Container(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-      color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+      ),
       child: Row(
         children: List.generate(steps.length, (i) {
           bool isActive = i == _currentStep;
@@ -149,18 +153,23 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                   width: 28,
                   height: 28,
                   decoration: BoxDecoration(
-                    color: isDone ? AppColors.primary : (isActive ? AppColors.primary : AppColors.surfaceVariant),
+                    color: isDone
+                        ? AppColors.primary
+                        : (isActive ? AppColors.primary : AppColors.surfaceVariant),
                     shape: BoxShape.circle,
+                    boxShadow: isActive
+                        ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8)]
+                        : null,
                   ),
                   child: Center(
                     child: isDone
-                        ? const Icon(Icons.check_rounded, size: 16, color: Colors.white)
+                        ? Icon(Icons.check_rounded, size: 16, color: AppColors.textOnPrimary)
                         : Text(
                             '${i + 1}',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: isActive ? Colors.white : AppColors.textTertiary,
+                              color: isActive ? AppColors.textOnPrimary : AppColors.textTertiary,
                             ),
                           ),
                   ),
@@ -240,7 +249,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
           ],
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   Widget _buildStep2(AdminProvider provider) {
@@ -277,7 +286,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                       value: b['id_barang'].toString(),
                       child: Text('[${b['kode_barang']}] ${b['nama_barang']}'),
                     )),
-                const DropdownMenuItem(
+                DropdownMenuItem(
                   value: 'NEW_ITEM',
                   child: Text('+ Tambah Barang Baru...', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700)),
                 ),
@@ -301,7 +310,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
           ],
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   Widget _buildStep3(AdminProvider provider) {
@@ -337,25 +346,25 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.infoBg,
+            color: AppColors.info.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(AppRadius.md),
             border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
           ),
-          child: const Row(
+          child: Row(
             children: [
               Icon(Icons.info_outline_rounded, size: 18, color: AppColors.info),
-              SizedBox(width: 10),
-              Expanded(
+              const SizedBox(width: 10),
+              const Expanded(
                 child: Text(
                   'Pastikan seluruh data sudah benar sebelum mengirim dokumen.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF1E40AF), fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
                 ),
               ),
             ],
           ),
         ),
       ],
-    );
+    ).animate().fadeIn(duration: 300.ms);
   }
 
   Widget _buildSummaryRow(String label, String value) {
@@ -381,9 +390,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, -4)),
-        ],
+        border: Border(top: BorderSide(color: AppColors.borderLight)),
       ),
       child: Row(
         children: [
@@ -412,7 +419,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                       }
                     },
               child: provider.isLoading
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2))
                   : Text(_currentStep < 2 ? 'Lanjutkan' : 'Simpan & Tugaskan'),
             ),
           ),
@@ -425,23 +432,17 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
     return Scaffold(
       body: Container(
         width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [AppColors.primarySurface, AppColors.surface],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppGradients.background),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.successBg,
+                color: AppColors.success.withValues(alpha: 0.12),
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: AppColors.success.withValues(alpha: 0.2), blurRadius: 30, spreadRadius: 5),
+                  BoxShadow(color: AppColors.success.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 5),
                 ],
               ),
               child: const Icon(Icons.check_rounded, size: 56, color: AppColors.success),
@@ -473,7 +474,13 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
       builder: (context) => StatefulBuilder(
         builder: (context, setStateDialog) => Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          child: Padding(
+          backgroundColor: AppColors.surface,
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(AppRadius.xl),
+              border: Border.all(color: AppColors.border),
+            ),
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -524,7 +531,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                                 }
                               },
                         child: isSaving
-                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2))
                             : const Text('Simpan Barang'),
                       ),
                     ),
@@ -544,11 +551,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
   Widget _buildSectionCard({required String title, required IconData icon, required List<Widget> children}) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: AppShadows.soft,
-      ),
+      decoration: AppGlass.elevatedCard(radius: AppRadius.xl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -557,10 +560,10 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
+                  color: AppColors.primary.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(AppRadius.sm),
                 ),
-                child: Icon(icon, color: AppColors.primaryDark, size: 20),
+                child: Icon(icon, color: AppColors.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
