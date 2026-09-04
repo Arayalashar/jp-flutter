@@ -15,6 +15,11 @@ class ApiConfig {
 
   // Auth
   static String get login => '$baseUrl/api/auth/login.php';
+  static String get updateProfile => '$baseUrl/api/auth/update_profile.php';
+
+  // Notifikasi
+  static String get getNotifikasi => '$baseUrl/api/notifikasi/get.php';
+  static String get readNotifikasi => '$baseUrl/api/notifikasi/read.php';
 
   // Dokumen
   static String get buatDokumen => '$baseUrl/api/dokumen/buat.php';

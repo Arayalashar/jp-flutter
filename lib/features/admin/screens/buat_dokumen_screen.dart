@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../providers/admin_provider.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
-import '../../../shared/theme/app_theme.dart';
+import '../../../shared/theme/light_theme.dart';
 
 class BuatDokumenScreen extends StatefulWidget {
   final String idAdmin;
@@ -27,7 +27,6 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-generate nomor resi
     final now = DateTime.now();
     _nomorController.text = 'NVG-${now.year}${now.month.toString().padLeft(2, '0')}-${now.millisecond.toString().padLeft(3, '0')}';
     
@@ -83,14 +82,17 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
     if (_showSuccess) return _buildSuccessOverlay();
 
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: LightTheme.background,
       appBar: AppBar(
-        title: const Text('Buat Dokumen Baru'),
+        title: const Text('Pengiriman Baru', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w700)),
+        backgroundColor: LightTheme.background,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: LightTheme.textPrimary),
       ),
       body: Consumer<AdminProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && provider.masterData == null) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
+            return const Center(child: CircularProgressIndicator(color: LightTheme.primary));
           }
 
           if (provider.errorMessage != null && provider.masterData == null) {
@@ -98,11 +100,15 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
+                  const Icon(Icons.error_outline_rounded, size: 48, color: LightTheme.warning),
                   const SizedBox(height: 16),
-                  Text(provider.errorMessage!, style: const TextStyle(color: AppColors.error)),
+                  Text(provider.errorMessage!, style: const TextStyle(color: LightTheme.warning)),
                   const SizedBox(height: 16),
-                  ElevatedButton(onPressed: () => provider.fetchMasterData(), child: const Text('Coba Lagi')),
+                  ElevatedButton(
+                    onPressed: () => provider.fetchMasterData(), 
+                    style: ElevatedButton.styleFrom(backgroundColor: LightTheme.primary),
+                    child: const Text('Coba Lagi', style: TextStyle(color: LightTheme.surface)),
+                  ),
                 ],
               ),
             );
@@ -110,22 +116,17 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
 
           return Column(
             children: [
-              // Step indicator
               _buildStepIndicator(),
-              
-              // Step content
               Expanded(
                 child: SingleChildScrollView(
                   physics: const BouncingScrollPhysics(),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                   child: AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
                     child: _buildStepContent(provider),
                   ),
                 ),
               ),
-
-              // Bottom navigation buttons
               _buildBottomButtons(provider),
             ],
           );
@@ -137,64 +138,69 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
   Widget _buildStepIndicator() {
     final steps = ['Informasi', 'Penugasan', 'Konfirmasi'];
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.borderLight)),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      decoration: const BoxDecoration(
+        color: LightTheme.surface,
+        border: Border(bottom: BorderSide(color: LightTheme.border)),
       ),
       child: Row(
-        children: List.generate(steps.length, (i) {
+        children: List.generate(steps.length * 2 - 1, (index) {
+          if (index.isOdd) {
+            // Connecting line
+            int stepIndex = index ~/ 2;
+            bool isDone = stepIndex < _currentStep;
+            return Expanded(
+              child: Container(
+                height: 1.5,
+                color: isDone ? LightTheme.primary : LightTheme.border,
+                margin: const EdgeInsets.symmetric(horizontal: 8),
+              ),
+            );
+          }
+
+          // Step item
+          int i = index ~/ 2;
           bool isActive = i == _currentStep;
           bool isDone = i < _currentStep;
-          return Expanded(
-            child: Row(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: isDone
-                        ? AppColors.primary
-                        : (isActive ? AppColors.primary : AppColors.surfaceVariant),
-                    shape: BoxShape.circle,
-                    boxShadow: isActive
-                        ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8)]
-                        : null,
-                  ),
-                  child: Center(
-                    child: isDone
-                        ? Icon(Icons.check_rounded, size: 16, color: AppColors.textOnPrimary)
-                        : Text(
-                            '${i + 1}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: isActive ? AppColors.textOnPrimary : AppColors.textTertiary,
-                            ),
+
+          return Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  color: isDone
+                      ? LightTheme.primary
+                      : (isActive ? LightTheme.primary : LightTheme.surfaceVariant),
+                  shape: BoxShape.circle,
+                  boxShadow: isActive
+                      ? [BoxShadow(color: LightTheme.primary.withValues(alpha: 0.3), blurRadius: 8)]
+                      : null,
+                ),
+                child: Center(
+                  child: isDone
+                      ? const Icon(Icons.check_rounded, size: 14, color: LightTheme.surface)
+                      : Text(
+                          '${i + 1}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: isActive ? LightTheme.surface : LightTheme.textTertiary,
                           ),
-                  ),
+                        ),
                 ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    steps[i],
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-                      color: isActive ? AppColors.textPrimary : AppColors.textTertiary,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                steps[i],
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                  color: isActive ? LightTheme.textPrimary : LightTheme.textTertiary,
                 ),
-                if (i < steps.length - 1)
-                  Container(
-                    width: 16,
-                    height: 1.5,
-                    color: isDone ? AppColors.primary : AppColors.border,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                  ),
-              ],
-            ),
+              ),
+            ],
           );
         }),
       ),
@@ -288,7 +294,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                     )),
                 DropdownMenuItem(
                   value: 'NEW_ITEM',
-                  child: Text('+ Tambah Barang Baru...', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700)),
+                  child: Text('+ Tambah Barang Baru...', style: TextStyle(color: LightTheme.primary, fontWeight: FontWeight.w700)),
                 ),
               ],
               onChanged: (val) {
@@ -336,7 +342,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
             _buildSummaryRow('Tipe Dokumen', _jenisDokumen),
             _buildSummaryRow('Nomor Resi', _nomorController.text),
             _buildSummaryRow('Tujuan', _tujuanController.text),
-            const Divider(height: 24, color: AppColors.borderLight),
+            const Divider(height: 24, color: LightTheme.border),
             _buildSummaryRow('Supir', supirName.toString()),
             _buildSummaryRow('Barang', '[${barangItem['kode_barang']}] ${barangItem['nama_barang']}'),
             _buildSummaryRow('Jumlah', '${_jumlahController.text} Unit'),
@@ -346,18 +352,18 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
         Container(
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.info.withValues(alpha: 0.08),
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.info.withValues(alpha: 0.2)),
+            color: const Color(0xFFEFF6FF), // Light blue info bg
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFFBFDBFE)),
           ),
-          child: Row(
+          child: const Row(
             children: [
-              Icon(Icons.info_outline_rounded, size: 18, color: AppColors.info),
-              const SizedBox(width: 10),
-              const Expanded(
+              Icon(Icons.info_outline_rounded, size: 18, color: Color(0xFF2563EB)),
+              SizedBox(width: 10),
+              Expanded(
                 child: Text(
                   'Pastikan seluruh data sudah benar sebelum mengirim dokumen.',
-                  style: TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 12, color: Color(0xFF1D4ED8), fontWeight: FontWeight.w500),
                 ),
               ),
             ],
@@ -375,10 +381,10 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
         children: [
           SizedBox(
             width: 110,
-            child: Text(label, style: const TextStyle(fontSize: 13, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
+            child: Text(label, style: const TextStyle(fontSize: 13, color: LightTheme.textSecondary, fontWeight: FontWeight.w500)),
           ),
           Expanded(
-            child: Text(value, style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w600)),
+            child: Text(value, style: const TextStyle(fontSize: 13, color: LightTheme.textPrimary, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -387,10 +393,10 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
 
   Widget _buildBottomButtons(AdminProvider provider) {
     return Container(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border(top: BorderSide(color: AppColors.borderLight)),
+      padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+      decoration: const BoxDecoration(
+        color: LightTheme.surface,
+        border: Border(top: BorderSide(color: LightTheme.border)),
       ),
       child: Row(
         children: [
@@ -398,7 +404,12 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () => setState(() => _currentStep--),
-                child: const Text('Kembali'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                  side: const BorderSide(color: LightTheme.border),
+                ),
+                child: const Text('Kembali', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w600)),
               ),
             ),
           if (_currentStep > 0) const SizedBox(width: 12),
@@ -418,9 +429,18 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                         _simpanDokumen();
                       }
                     },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: LightTheme.primary,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                elevation: 0,
+              ),
               child: provider.isLoading
-                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2))
-                  : Text(_currentStep < 2 ? 'Lanjutkan' : 'Simpan & Tugaskan'),
+                  ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: LightTheme.surface, strokeWidth: 2))
+                  : Text(
+                      _currentStep < 2 ? 'Lanjutkan' : 'Simpan & Tugaskan',
+                      style: const TextStyle(color: LightTheme.surface, fontWeight: FontWeight.w700),
+                    ),
             ),
           ),
         ],
@@ -430,33 +450,29 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
 
   Widget _buildSuccessOverlay() {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(gradient: AppGradients.background),
+      backgroundColor: LightTheme.surface,
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.12),
+                color: LightTheme.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(color: AppColors.success.withValues(alpha: 0.15), blurRadius: 30, spreadRadius: 5),
-                ],
               ),
-              child: const Icon(Icons.check_rounded, size: 56, color: AppColors.success),
-            ),
+              child: const Icon(Icons.check_rounded, size: 56, color: LightTheme.success),
+            ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
             const SizedBox(height: 24),
             const Text(
               'Dokumen Berhasil Dibuat!',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
-            ),
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: LightTheme.textPrimary),
+            ).animate().fadeIn(delay: 200.ms),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Tugas telah dikirim ke supir yang ditugaskan',
-              style: TextStyle(fontSize: 14, color: AppColors.textTertiary),
-            ),
+              style: TextStyle(fontSize: 14, color: LightTheme.textSecondary),
+            ).animate().fadeIn(delay: 300.ms),
           ],
         ),
       ),
@@ -473,20 +489,15 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
       barrierDismissible: false,
       builder: (context) => StatefulBuilder(
         builder: (context, setStateDialog) => Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-          backgroundColor: AppColors.surface,
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              border: Border.all(color: AppColors.border),
-            ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: LightTheme.surface,
+          child: Padding(
             padding: const EdgeInsets.all(24),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Tambah Barang Baru", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                const Text("Tambah Barang Baru", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
                 const SizedBox(height: 20),
                 _buildLabel('Nama Barang'),
                 _buildTextField(controller: namaCtrl, hint: 'Misal: Navagreen Facial Wash', icon: Icons.inventory_2_outlined),
@@ -499,7 +510,12 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: isSaving ? null : () => Navigator.pop(context),
-                        child: const Text('Batal'),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                          side: const BorderSide(color: LightTheme.border),
+                        ),
+                        child: const Text('Batal', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -521,7 +537,6 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                                   Navigator.pop(context);
                                   if (result['status'] == 'success') {
                                     CustomSnackbar.show(context, '✅ Barang berhasil ditambahkan!');
-                                    // Select the new item
                                     setState(() {
                                       _selectedBarang = result['data']['id_barang'].toString();
                                     });
@@ -530,9 +545,15 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                                   }
                                 }
                               },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: LightTheme.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                          elevation: 0,
+                        ),
                         child: isSaving
-                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: AppColors.textOnPrimary, strokeWidth: 2))
-                            : const Text('Simpan Barang'),
+                            ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: LightTheme.surface, strokeWidth: 2))
+                            : const Text('Simpan', style: TextStyle(color: LightTheme.surface, fontWeight: FontWeight.w700)),
                       ),
                     ),
                   ],
@@ -550,26 +571,26 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
   // ============================================================
   Widget _buildSectionCard({required String title, required IconData icon, required List<Widget> children}) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: AppGlass.elevatedCard(radius: AppRadius.xl),
+      padding: const EdgeInsets.all(24),
+      decoration: LightTheme.cardDecoration(radius: 24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
+                  color: LightTheme.surfaceVariant,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: AppColors.primary, size: 20),
+                child: Icon(icon, color: LightTheme.textPrimary, size: 20),
               ),
               const SizedBox(width: 12),
-              Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: LightTheme.textPrimary)),
             ],
           ),
-          const Divider(height: 28, color: AppColors.borderLight),
+          const SizedBox(height: 24),
           ...children,
         ],
       ),
@@ -579,7 +600,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
   Widget _buildLabel(String text) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+      child: Text(text, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
     );
   }
 
@@ -594,12 +615,24 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
-      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+      style: const TextStyle(fontSize: 14, color: LightTheme.textPrimary, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
+        hintStyle: const TextStyle(color: LightTheme.textTertiary),
+        filled: true,
+        fillColor: LightTheme.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         prefixIcon: Padding(
           padding: EdgeInsets.only(bottom: maxLines > 1 ? 24.0 : 0),
-          child: Icon(icon, size: 20, color: AppColors.textTertiary),
+          child: Icon(icon, size: 20, color: LightTheme.textTertiary),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: LightTheme.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: LightTheme.primary, width: 2),
         ),
       ),
     );
@@ -611,19 +644,25 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
     required List<DropdownMenuItem<T>> items,
     required ValueChanged<T?> onChanged,
   }) {
-    return InputDecorator(
-      decoration: const InputDecoration(),
-      child: DropdownButton<T>(
-        isExpanded: true,
-        value: value,
-        hint: hint != null ? Text(hint, style: const TextStyle(color: AppColors.textTertiary, fontSize: 13)) : null,
-        items: items,
-        onChanged: onChanged,
-        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textTertiary),
-        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
-        dropdownColor: AppColors.surface,
-        underline: const SizedBox(),
-        isDense: true,
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: LightTheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: LightTheme.border),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          isExpanded: true,
+          value: value,
+          hint: hint != null ? Text(hint, style: const TextStyle(color: LightTheme.textTertiary, fontSize: 14)) : null,
+          items: items,
+          onChanged: onChanged,
+          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: LightTheme.textTertiary),
+          style: const TextStyle(fontSize: 14, color: LightTheme.textPrimary, fontWeight: FontWeight.w500),
+          dropdownColor: LightTheme.surface,
+          isDense: false,
+        ),
       ),
     );
   }

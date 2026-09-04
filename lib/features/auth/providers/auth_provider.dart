@@ -44,6 +44,27 @@ class AuthProvider extends ChangeNotifier {
     return result;
   }
 
+  Future<Map<String, dynamic>> updateProfile(String namaLengkap, String password) async {
+    if (_currentUser == null) return {'success': false, 'message': 'Belum login'};
+
+    _isLoading = true;
+    notifyListeners();
+
+    final result = await _repository.updateProfile(_currentUser!.idUser, namaLengkap, password);
+
+    if (result['success'] == true) {
+      _currentUser = result['user'];
+      
+      // Update session
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('nama_lengkap', _currentUser!.namaLengkap);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return result;
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();

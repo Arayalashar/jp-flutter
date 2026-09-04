@@ -9,6 +9,7 @@ import '../../features/gudang/screens/packing_screen.dart';
 import '../../features/admin/screens/buat_dokumen_screen.dart';
 import '../../features/admin/screens/laporan_screen.dart';
 import '../../features/admin/screens/riwayat_pemeriksaan_screen.dart';
+import '../../features/admin/screens/admin_dashboard_screen.dart';
 import '../../features/supir/screens/tugas_supir_screen.dart';
 
 // Design system
@@ -122,6 +123,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final normalizedRole = _getNormalizedRole();
+    if (normalizedRole == 'admin') {
+      return const AdminDashboardScreen();
+    }
     final tabs = _buildTabs(normalizedRole);
     final navItems = _buildNavItems(normalizedRole);
 
