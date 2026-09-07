@@ -11,7 +11,8 @@ import '../../../shared/theme/light_theme.dart';
 class PemeriksaanScreen extends StatefulWidget {
   final String idSpv;
   final Map<String, dynamic> stats;
-  const PemeriksaanScreen({super.key, required this.idSpv, required this.stats});
+  final VoidCallback? onTaskCompleted;
+  const PemeriksaanScreen({super.key, required this.idSpv, required this.stats, this.onTaskCompleted});
 
   @override
   State<PemeriksaanScreen> createState() => _PemeriksaanScreenState();
@@ -177,6 +178,7 @@ class _PemeriksaanScreenState extends State<PemeriksaanScreen> {
                                 if (mounted) {
                                   if (result['status'] == 'success') {
                                     CustomSnackbar.show(context, "✅ Hasil pemeriksaan tersimpan!");
+                                    widget.onTaskCompleted?.call();
                                   } else {
                                     CustomSnackbar.show(context, result['message'] ?? 'Gagal', isError: true);
                                   }

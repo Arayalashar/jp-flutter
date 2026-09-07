@@ -21,8 +21,11 @@ import '../../features/admin/screens/notification_screen.dart';
 import '../theme/light_theme.dart';
 
 // Network
-import '../../core/network/api_client.dart';
+import 'package:provider/provider.dart';
+import '../../features/admin/providers/notification_provider.dart';
+import '../../features/spv/providers/spv_provider.dart';
 import '../../core/config/api_config.dart';
+import '../../core/network/api_client.dart';
 
 class DashboardScreen extends StatefulWidget {
   final String role;
@@ -58,6 +61,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       '${ApiConfig.dashboardStats}?role=$roleParam&id_user=${widget.idUser}',
     );
     if (mounted) {
+      context.read<NotificationProvider>().fetchNotifications(widget.idUser);
       setState(() {
         _stats = response['data'] ?? {};
         _statsLoading = false;
@@ -100,7 +104,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
         bottomNavigationBar: _FloatingNavbar(
           currentIndex: _currentIndex,
-          onTap: (index) => setState(() => _currentIndex = index),
+          onTap: (index) {
+            setState(() => _currentIndex = index);
+            if (index == 0) _fetchStats();
+            if (index == 2 && _getNormalizedRole() == 'spv') {
+              context.read<SpvProvider>().fetchRiwayat(widget.idUser);
+            }
+          },
           navData: navItems,
           onFabTap: _fetchStats,
         ),
@@ -128,7 +138,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
       case 'spv':
         return [
           _buildHomeTab(),
-          PemeriksaanScreen(idSpv: widget.idUser, stats: _stats),
+          PemeriksaanScreen(
+            idSpv: widget.idUser, 
+            stats: _stats,
+            onTaskCompleted: () {
+              _fetchStats();
+              context.read<SpvProvider>().fetchRiwayat(widget.idUser);
+            },
+          ),
           RiwayatSpvScreen(idSpv: widget.idUser),
           ProfilScreen(nama: widget.nama, role: widget.role, stats: _stats),
         ];
@@ -258,21 +275,43 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
             ],
           ),
-                    GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationScreen()));
+          Consumer<NotificationProvider>(
+            builder: (context, notifProvider, child) {
+              final unread = notifProvider.unreadCount;
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationScreen()));
+                },
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: LightTheme.surface,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: LightTheme.border),
+                        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
+                      ),
+                      child: const Icon(Icons.notifications_none_rounded, color: LightTheme.textPrimary, size: 22),
+                    ),
+                    if (unread > 0)
+                      Positioned(
+                        right: 12,
+                        top: 12,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFEF4444),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              );
             },
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: LightTheme.surface,
-                shape: BoxShape.circle,
-                border: Border.all(color: LightTheme.border),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))],
-              ),
-              child: const Icon(Icons.notifications_none_rounded, color: LightTheme.textPrimary, size: 22),
-            ),
           ),
         
         ],
