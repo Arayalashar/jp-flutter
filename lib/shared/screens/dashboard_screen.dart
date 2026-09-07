@@ -467,7 +467,7 @@ class _BentoGrid extends StatelessWidget {
           title: "Ringkasan Mingguan",
           subtitle: "Total: $nTotal",
           isPrimary: true,
-          child: _buildMockBarChart(),
+          child: _buildBarChart(),
         ),
       ],
     );
@@ -533,22 +533,31 @@ class _BentoGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildMockBarChart() {
-    final data = [4, 6, 3, 8, 5, 2, 1];
+  Widget _buildBarChart() {
+    List<dynamic> rawData = stats['chart_data'] ?? [0,0,0,0,0,0,0];
+    List<int> data = rawData.map((e) => int.tryParse(e.toString()) ?? 0).toList();
+    if (data.length < 7) {
+      data = List.generate(7, (i) => i < data.length ? data[i] : 0);
+    }
+    
     final days = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
-    final maxVal = 8;
+    int maxVal = data.isEmpty ? 8 : data.reduce((curr, next) => curr > next ? curr : next);
+    if (maxVal < 8) maxVal = 8; // ensure min height scale
+
+    // Find the current day index (Monday = 0, Sunday = 6)
+    final todayIdx = DateTime.now().weekday - 1;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: List.generate(7, (i) {
-        final height = (data[i] / maxVal) * 60;
-        final isToday = i == 0;
+        final height = (data[i] / maxVal) * 60.0;
+        final isToday = i == todayIdx;
         return Column(
           children: [
             Container(
               width: 24,
-              height: height,
+              height: height > 0 ? height : 4.0,
               decoration: BoxDecoration(
                 color: isToday ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(6),
