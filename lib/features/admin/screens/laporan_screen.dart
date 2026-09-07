@@ -96,51 +96,9 @@ class _LaporanScreenState extends State<LaporanScreen> {
                           children: [
                             Expanded(child: _buildStatCard('Total', summary['total'].toString(), LightTheme.primary, LightTheme.surface)),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildStatCard('Selesai', summary['selesai'].toString(), LightTheme.surfaceVariant, LightTheme.textPrimary)),
+                            Expanded(child: _buildStatCard('Selesai', summary['selesai'].toString(), LightTheme.primary.withValues(alpha: 0.1), LightTheme.primary)),
                             const SizedBox(width: 12),
-                            Expanded(child: _buildStatCard('Kendala', summary['gagal'].toString(), LightTheme.surfaceVariant, LightTheme.textPrimary)),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        // Mini Visual Bar
-                        Builder(
-                          builder: (context) {
-                            final total = int.tryParse(summary['total'].toString()) ?? 0;
-                            final selesai = int.tryParse(summary['selesai'].toString()) ?? 0;
-                            final gagal = int.tryParse(summary['gagal'].toString()) ?? 0;
-
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(999),
-                              child: Container(
-                                height: 12,
-                                width: double.infinity,
-                                color: LightTheme.surfaceVariant,
-                                child: Row(
-                                  children: [
-                                    if (total > 0 && selesai > 0)
-                                      Expanded(
-                                        flex: selesai,
-                                        child: Container(color: LightTheme.success),
-                                      ),
-                                    if (total > 0 && gagal > 0)
-                                      Expanded(
-                                        flex: gagal,
-                                        child: Container(color: LightTheme.warning),
-                                      ),
-                                    if (total == 0)
-                                      Expanded(child: Container(color: LightTheme.surfaceVariant)),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text('Tingkat Sukses', style: TextStyle(fontSize: 11, color: LightTheme.textSecondary, fontWeight: FontWeight.w600)),
-                            Text('Tingkat Kendala', style: TextStyle(fontSize: 11, color: LightTheme.textSecondary, fontWeight: FontWeight.w600)),
+                            Expanded(child: _buildStatCard('Kendala', summary['gagal'].toString(), LightTheme.primary.withValues(alpha: 0.1), LightTheme.primary)),
                           ],
                         ),
                       ],
@@ -149,41 +107,41 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 ),
 
                 // Filter chips
-                SliverToBoxAdapter(
-                  child: Container(
-                    height: 48,
-                    margin: const EdgeInsets.only(top: 24, bottom: 8),
-                    child: ListView.builder(
-                      scrollDirection: Axis.horizontal,
+                  SliverToBoxAdapter(
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 24, bottom: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      itemCount: _filters.length,
-                      itemBuilder: (context, index) {
-                        final f = _filters[index];
-                        final isSelected = f == _selectedFilter;
-                        return Padding(
-                          padding: const EdgeInsets.only(right: 8),
-                          child: ChoiceChip(
-                            label: Text(f),
-                            selected: isSelected,
-                            onSelected: (_) => setState(() => _selectedFilter = f),
-                            selectedColor: LightTheme.primary.withValues(alpha: 0.1),
-                            backgroundColor: LightTheme.surfaceVariant,
-                            labelStyle: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected ? LightTheme.primary : LightTheme.textTertiary,
+                      child: Row(
+                        children: _filters.map((f) {
+                          final isSelected = f == _selectedFilter;
+                          final isLast = f == _filters.last;
+                          return Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(right: isLast ? 0 : 8),
+                              child: ChoiceChip(
+                                label: Center(child: Text(f)),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _selectedFilter = f),
+                                selectedColor: LightTheme.primary,
+                                backgroundColor: LightTheme.primary.withValues(alpha: 0.05),
+                                labelStyle: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected ? LightTheme.surface : LightTheme.primary.withValues(alpha: 0.8),
+                                ),
+                                side: BorderSide(
+                                  color: isSelected ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.2),
+                                ),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                                showCheckmark: false,
+                                padding: EdgeInsets.zero,
+                              ),
                             ),
-                            side: BorderSide(
-                              color: isSelected ? LightTheme.primary.withValues(alpha: 0.3) : Colors.transparent,
-                            ),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                            showCheckmark: false,
-                          ),
-                        );
-                      },
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
-                ),
 
                 // List
                 if (filtered.isEmpty)
@@ -254,10 +212,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: LightTheme.surfaceVariant,
+                  color: LightTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Icons.description_rounded, color: LightTheme.textPrimary),
+                child: const Icon(Icons.description_rounded, color: LightTheme.primary),
               ),
               const SizedBox(width: 16),
               Expanded(
@@ -273,10 +231,10 @@ class _LaporanScreenState extends State<LaporanScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: LightTheme.surfaceVariant,
+                  color: LightTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: LightTheme.textPrimary)),
+                child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: LightTheme.primary)),
               ),
             ],
           ),

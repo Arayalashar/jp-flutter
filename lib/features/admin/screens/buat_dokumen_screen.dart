@@ -172,7 +172,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                 decoration: BoxDecoration(
                   color: isDone
                       ? LightTheme.primary
-                      : (isActive ? LightTheme.primary : LightTheme.surfaceVariant),
+                      : (isActive ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.1)),
                   shape: BoxShape.circle,
                   boxShadow: isActive
                       ? [BoxShadow(color: LightTheme.primary.withValues(alpha: 0.3), blurRadius: 8)]
@@ -186,7 +186,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: isActive ? LightTheme.surface : LightTheme.textTertiary,
+                            color: isActive ? LightTheme.surface : LightTheme.primary.withValues(alpha: 0.6),
                           ),
                         ),
                 ),
@@ -197,7 +197,7 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
-                  color: isActive ? LightTheme.textPrimary : LightTheme.textTertiary,
+                  color: isActive ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.6),
                 ),
               ),
             ],
@@ -581,10 +581,10 @@ class _BuatDokumenScreenState extends State<BuatDokumenScreen> {
               Container(
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: LightTheme.surfaceVariant,
+                  color: LightTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(icon, color: LightTheme.textPrimary, size: 20),
+                child: Icon(icon, color: LightTheme.primary, size: 20),
               ),
               const SizedBox(width: 12),
               Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: LightTheme.textPrimary)),

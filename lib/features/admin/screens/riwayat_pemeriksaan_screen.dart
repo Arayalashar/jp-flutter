@@ -125,12 +125,12 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
-                                  decoration: BoxDecoration(color: LightTheme.surfaceVariant, borderRadius: BorderRadius.circular(20)),
+                                  decoration: BoxDecoration(color: LightTheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text('$totalLengkap', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
-                                      const Text('Lengkap', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
+                                      Text('$totalLengkap', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.primary)),
+                                      const Text('Lengkap', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.primary)),
                                     ],
                                   ),
                                 ),
@@ -139,12 +139,12 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
-                                  decoration: BoxDecoration(color: LightTheme.surfaceVariant, borderRadius: BorderRadius.circular(20)),
+                                  decoration: BoxDecoration(color: LightTheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text('$totalRusak', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
-                                      const Text('Rusak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
+                                      Text('$totalRusak', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.primary)),
+                                      const Text('Rusak', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.primary)),
                                     ],
                                   ),
                                 ),
@@ -160,30 +160,30 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                     child: Container(
                       margin: const EdgeInsets.only(top: 24, bottom: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Wrap(
-                        alignment: WrapAlignment.center,
-                        spacing: 8,
-                        runSpacing: 8,
-                        children: filters.map((filter) {
-                          final isSelected = filter == currentFilter;
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() => _selectedFilter = filter);
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: isSelected ? LightTheme.textPrimary : LightTheme.surfaceVariant,
-                                borderRadius: BorderRadius.circular(999),
-                              ),
-                              child: Text(
-                                filter,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w700,
-                                  color: isSelected ? LightTheme.surface : LightTheme.textSecondary,
+                      child: Row(
+                        children: filters.map((f) {
+                          final isSelected = f == currentFilter;
+                          final isLast = f == filters.last;
+                          return Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.only(right: isLast ? 0 : 8),
+                              child: ChoiceChip(
+                                label: Center(child: Text(f)),
+                                selected: isSelected,
+                                onSelected: (_) => setState(() => _selectedFilter = f),
+                                selectedColor: LightTheme.primary,
+                                backgroundColor: LightTheme.primary.withValues(alpha: 0.05),
+                                labelStyle: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected ? LightTheme.surface : LightTheme.primary.withValues(alpha: 0.8),
                                 ),
+                                side: BorderSide(
+                                  color: isSelected ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.2),
+                                ),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                                showCheckmark: false,
+                                padding: EdgeInsets.zero,
                               ),
                             ),
                           );
@@ -249,10 +249,10 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: LightTheme.surfaceVariant,
+                  color: LightTheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: LightTheme.textPrimary)),
+                child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: LightTheme.primary)),
               ),
             ],
           ),
@@ -297,7 +297,7 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             decoration: BoxDecoration(
-              color: LightTheme.surfaceVariant,
+              color: LightTheme.primary.withValues(alpha: 0.05),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Row(
