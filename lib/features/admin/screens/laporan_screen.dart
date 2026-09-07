@@ -110,35 +110,33 @@ class _LaporanScreenState extends State<LaporanScreen> {
                   SliverToBoxAdapter(
                     child: Container(
                       margin: const EdgeInsets.only(top: 24, bottom: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Row(
-                        children: _filters.map((f) {
+                      height: 40,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        itemCount: _filters.length,
+                        separatorBuilder: (context, index) => const SizedBox(width: 8),
+                        itemBuilder: (context, index) {
+                          final f = _filters[index];
                           final isSelected = f == _selectedFilter;
-                          final isLast = f == _filters.last;
-                          return Expanded(
-                            child: Padding(
-                              padding: EdgeInsets.only(right: isLast ? 0 : 8),
-                              child: ChoiceChip(
-                                label: Center(child: Text(f)),
-                                selected: isSelected,
-                                onSelected: (_) => setState(() => _selectedFilter = f),
-                                selectedColor: LightTheme.primary,
-                                backgroundColor: LightTheme.primary.withValues(alpha: 0.05),
-                                labelStyle: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: isSelected ? LightTheme.surface : LightTheme.primary.withValues(alpha: 0.8),
-                                ),
-                                side: BorderSide(
-                                  color: isSelected ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.2),
-                                ),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
-                                showCheckmark: false,
-                                padding: EdgeInsets.zero,
-                              ),
+                          return ChoiceChip(
+                            label: Text(f),
+                            selected: isSelected,
+                            onSelected: (_) => setState(() => _selectedFilter = f),
+                            selectedColor: LightTheme.primary,
+                            backgroundColor: LightTheme.primary.withValues(alpha: 0.05),
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? LightTheme.surface : LightTheme.primary.withValues(alpha: 0.8),
                             ),
+                            side: BorderSide(
+                              color: isSelected ? LightTheme.primary : LightTheme.primary.withValues(alpha: 0.2),
+                            ),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+                            showCheckmark: false,
                           );
-                        }).toList(),
+                        },
                       ),
                     ),
                   ),
@@ -252,13 +250,17 @@ class _LaporanScreenState extends State<LaporanScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  _buildMetaChip(Icons.calendar_today_rounded, doc['tanggal_buat'] ?? '-'),
-                  const SizedBox(width: 16),
-                  _buildMetaChip(Icons.update_rounded, doc['waktu_update'] ?? '-'),
-                ],
+              Expanded(
+                child: Wrap(
+                  spacing: 16,
+                  runSpacing: 8,
+                  children: [
+                    _buildMetaChip(Icons.calendar_today_rounded, doc['tanggal_buat'] ?? '-'),
+                    _buildMetaChip(Icons.update_rounded, doc['waktu_update'] ?? '-'),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               InkWell(
                 onTap: () async {
                   await PdfService.printDokumen(Map<String, dynamic>.from(doc));

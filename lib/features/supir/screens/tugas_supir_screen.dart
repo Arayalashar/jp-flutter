@@ -5,7 +5,8 @@ import '../providers/supir_provider.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
-import '../../../shared/theme/app_theme.dart';
+import '../../../shared/theme/light_theme.dart';
+
 
 class TugasSupirScreen extends StatefulWidget {
   final String idSupir;
@@ -35,15 +36,15 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
             return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.xl)),
-              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              backgroundColor: LightTheme.surface,
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(AppRadius.xl),
-                    border: Border.all(color: AppColors.border),
+                    color: LightTheme.surface,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: LightTheme.border),
                   ),
                   padding: const EdgeInsets.all(24),
                   child: Column(
@@ -55,14 +56,14 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: AppColors.primary.withValues(alpha: 0.12),
-                              borderRadius: BorderRadius.circular(AppRadius.md),
+                              color: LightTheme.primary.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Icon(Icons.local_shipping_outlined, color: AppColors.primary, size: 24),
+                            child: Icon(Icons.local_shipping_outlined, color: LightTheme.primary, size: 24),
                           ),
                           const SizedBox(width: 14),
                           const Expanded(
-                            child: Text("Update Pengiriman", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                            child: Text("Update Pengiriman", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
                           ),
                         ],
                       ),
@@ -73,27 +74,27 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
-                          color: AppColors.surfaceVariant,
-                          borderRadius: BorderRadius.circular(AppRadius.md),
-                          border: Border.all(color: AppColors.borderLight),
+                          color: LightTheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: LightTheme.border),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(tugas['nomor_dokumen'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                            Text(tugas['nomor_dokumen'], style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
                             const SizedBox(height: 4),
-                            Text("Tujuan: ${tugas['tujuan_pengiriman']}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: AppColors.textTertiary)),
+                            Text("Tujuan: ${tugas['tujuan_pengiriman']}", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: LightTheme.textTertiary)),
                           ],
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      const Text("Status Terbaru", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      const Text("Status Terbaru", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
                       const SizedBox(height: 8),
                       DropdownButtonFormField<String>(
                         value: selectedStatus,
-                        dropdownColor: AppColors.surface,
-                        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.textTertiary),
+                        dropdownColor: LightTheme.surface,
+                        icon: const Icon(Icons.keyboard_arrow_down_rounded, color: LightTheme.textTertiary),
                         items: ['Dalam Perjalanan', 'Sampai Tujuan', 'Gagal Kirim']
                             .map((e) => DropdownMenuItem(value: e, child: Text(e, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500))))
                             .toList(),
@@ -102,12 +103,12 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      const Text("Keterangan Tambahan", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary)),
+                      const Text("Keterangan Tambahan", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
                       const SizedBox(height: 8),
                       TextField(
                         controller: ketController,
                         maxLines: 2,
-                        style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
+                        style: const TextStyle(fontSize: 14, color: LightTheme.textPrimary),
                         decoration: const InputDecoration(hintText: "Nama Penerima / Alasan Gagal..."),
                       ),
                       const SizedBox(height: 28),
@@ -160,54 +161,76 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text("Tugas Pengiriman")),
-      body: Consumer<SupirProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.tugasList.isEmpty) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-          }
-
-          if (provider.errorMessage != null && provider.tugasList.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
-                  const SizedBox(height: 16),
-                  Text(provider.errorMessage!, style: const TextStyle(color: AppColors.error)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(onPressed: () => provider.fetchTugas(widget.idSupir), child: const Text('Coba Lagi')),
+      backgroundColor: LightTheme.background,
+      appBar: AppBar(
+        title: const Text('Daftar Pengiriman', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w700)),
+        backgroundColor: LightTheme.background,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: Consumer<SupirProvider>(
+          builder: (context, provider, child) {
+            return RefreshIndicator(
+              onRefresh: () => provider.fetchTugas(widget.idSupir),
+              color: LightTheme.primary,
+              backgroundColor: LightTheme.surface,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                slivers: [
+                  
+                  if (provider.isLoading && provider.tugasList.isEmpty)
+                    const SliverFillRemaining(
+                      child: Center(child: CircularProgressIndicator(color: LightTheme.primary)),
+                    )
+                  else if (provider.errorMessage != null && provider.tugasList.isEmpty)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline_rounded, size: 48, color: const Color(0xFFEF4444)),
+                            const SizedBox(height: 16),
+                            Text(provider.errorMessage!, style: const TextStyle(color: const Color(0xFFEF4444))),
+                            const SizedBox(height: 16),
+                            ElevatedButton(onPressed: () => provider.fetchTugas(widget.idSupir), child: const Text('Coba Lagi')),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                    sliver: provider.tugasList.isEmpty
+                        ? SliverToBoxAdapter(
+                            child: const EmptyStateWidget(
+                              icon: Icons.local_shipping_outlined,
+                              title: 'Belum ada tugas pengiriman',
+                              subtitle: 'Tarik ke bawah untuk memuat ulang',
+                            ),
+                          )
+                        : SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) => _buildTugasCard(provider.tugasList[index])
+                                  .animate()
+                                  .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
+                                  .slideY(begin: 0.05, end: 0, duration: 400.ms),
+                              childCount: provider.tugasList.length,
+                            ),
+                          ),
+                  ),
                 ],
               ),
             );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => provider.fetchTugas(widget.idSupir),
-            color: AppColors.primary,
-            backgroundColor: AppColors.surface,
-            child: provider.tugasList.isEmpty
-                ? const EmptyStateWidget(
-                    icon: Icons.local_shipping_outlined,
-                    title: 'Belum ada tugas pengiriman',
-                    subtitle: 'Tarik ke bawah untuk memuat ulang',
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    itemCount: provider.tugasList.length,
-                    itemBuilder: (context, index) => _buildTugasCard(provider.tugasList[index])
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
-                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
-                  ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
 
+  
+  
   Widget _buildTugasCard(Map<String, dynamic> tugas) {
     final status = tugas['status_pengiriman'] ?? 'Pending';
     bool isSelesai = status == 'Sampai Tujuan';
@@ -222,11 +245,11 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
       padding: const EdgeInsets.all(20),
       decoration: isSelesai
           ? BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: AppColors.success.withValues(alpha: 0.15)),
+              color: LightTheme.success.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: LightTheme.success.withValues(alpha: 0.15)),
             )
-          : AppGlass.elevatedCard(radius: AppRadius.lg),
+          : BoxDecoration(color: LightTheme.surface, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))], border: Border.all(color: LightTheme.border)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -236,7 +259,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
               Expanded(
                 child: Text(
                   tugas['nomor_dokumen'],
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: isSelesai ? AppColors.textTertiary : AppColors.textPrimary),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: isSelesai ? LightTheme.textTertiary : LightTheme.textPrimary),
                 ),
               ),
               StatusBadge(status: status),
@@ -244,7 +267,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: AppColors.borderLight),
+            child: Divider(height: 1, color: LightTheme.border),
           ),
           _buildInfoRow(Icons.description_outlined, "Tipe:", tugas['jenis_dokumen'], isSelesai),
           const SizedBox(height: 8),
@@ -265,17 +288,17 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           width: 22,
                           height: 22,
                           decoration: BoxDecoration(
-                            color: done ? AppColors.primary : AppColors.surfaceVariant,
+                            color: done ? LightTheme.primary : LightTheme.surfaceVariant,
                             shape: BoxShape.circle,
                             border: isCurrent
-                                ? Border.all(color: AppColors.primary.withValues(alpha: 0.5), width: 2)
+                                ? Border.all(color: LightTheme.primary.withValues(alpha: 0.5), width: 2)
                                 : null,
                             boxShadow: isCurrent
-                                ? [BoxShadow(color: AppColors.primary.withValues(alpha: 0.3), blurRadius: 8)]
+                                ? [BoxShadow(color: LightTheme.primary.withValues(alpha: 0.3), blurRadius: 8)]
                                 : null,
                           ),
                           child: done
-                              ? Icon(Icons.check, size: 14, color: AppColors.textOnPrimary)
+                              ? Icon(Icons.check, size: 14, color: Colors.white)
                               : null,
                         ),
                         const SizedBox(height: 4),
@@ -285,7 +308,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: done ? FontWeight.w700 : FontWeight.w500,
-                            color: done ? AppColors.primary : AppColors.textTertiary,
+                            color: done ? LightTheme.primary : LightTheme.textTertiary,
                           ),
                         ),
                       ],
@@ -296,7 +319,7 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
                           height: 2,
                           margin: const EdgeInsets.only(bottom: 20),
                           decoration: BoxDecoration(
-                            color: i < currentStepIndex ? AppColors.primary : AppColors.border,
+                            color: i < currentStepIndex ? LightTheme.primary : LightTheme.border,
                             borderRadius: BorderRadius.circular(1),
                           ),
                         ),
@@ -328,15 +351,15 @@ class _TugasSupirScreenState extends State<TugasSupirScreen> {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(padding: const EdgeInsets.only(top: 2), child: Icon(icon, size: 16, color: AppColors.textTertiary)),
+        Padding(padding: const EdgeInsets.only(top: 2), child: Icon(icon, size: 16, color: LightTheme.textTertiary)),
         const SizedBox(width: 8),
-        Text("$label ", style: TextStyle(fontSize: 13, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
+        Text("$label ", style: TextStyle(fontSize: 13, color: LightTheme.textTertiary, fontWeight: FontWeight.w500)),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
               fontSize: 13,
-              color: isSelesai ? AppColors.textTertiary : (isHighlight ? AppColors.info : AppColors.textPrimary),
+              color: isSelesai ? LightTheme.textTertiary : (isHighlight ? const Color(0xFF3B82F6) : LightTheme.textPrimary),
               fontWeight: isHighlight ? FontWeight.w800 : FontWeight.w600,
               height: 1.4,
             ),

@@ -6,7 +6,8 @@ import '../models/gudang_model.dart';
 import '../../../shared/widgets/custom_snackbar.dart';
 import '../../../shared/widgets/status_badge.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
-import '../../../shared/theme/app_theme.dart';
+import '../../../shared/theme/light_theme.dart';
+
 
 class PackingScreen extends StatefulWidget {
   final String idGudang;
@@ -29,36 +30,36 @@ class _PackingScreenState extends State<PackingScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: AppColors.surface,
+        backgroundColor: LightTheme.surface,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          side: BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: LightTheme.border),
         ),
         title: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.12),
-                borderRadius: BorderRadius.circular(AppRadius.sm),
+                color: LightTheme.primary.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(Icons.check_box_outlined, color: AppColors.primary, size: 20),
+              child: Icon(Icons.check_box_outlined, color: LightTheme.primary, size: 20),
             ),
             const SizedBox(width: 12),
             const Expanded(
-              child: Text("Konfirmasi Packing", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: AppColors.textPrimary)),
+              child: Text("Konfirmasi Packing", style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: LightTheme.textPrimary)),
             ),
           ],
         ),
         content: Text(
           "Barang '$namaBarang' sudah selesai dipacking dan siap diserahkan ke Supir?",
-          style: const TextStyle(fontSize: 14, color: AppColors.textSecondary, height: 1.5),
+          style: const TextStyle(fontSize: 14, color: LightTheme.textSecondary, height: 1.5),
         ),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Belum", style: TextStyle(color: AppColors.textTertiary, fontWeight: FontWeight.w600)),
+            child: const Text("Belum", style: TextStyle(color: LightTheme.textTertiary, fontWeight: FontWeight.w600)),
           ),
           ElevatedButton.icon(
             onPressed: () async {
@@ -84,54 +85,76 @@ class _PackingScreenState extends State<PackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text("Tugas Sortir & Packing")),
-      body: Consumer<GudangProvider>(
-        builder: (context, provider, child) {
-          if (provider.isLoading && provider.tugasList.isEmpty) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.primary));
-          }
-
-          if (provider.errorMessage != null && provider.tugasList.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline_rounded, size: 48, color: AppColors.error),
-                  const SizedBox(height: 16),
-                  Text(provider.errorMessage!, style: const TextStyle(color: AppColors.error)),
-                  const SizedBox(height: 16),
-                  ElevatedButton(onPressed: () => provider.fetchTugas(), child: const Text('Coba Lagi')),
+      backgroundColor: LightTheme.background,
+      appBar: AppBar(
+        title: const Text('Daftar Tugas Packing', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w700)),
+        backgroundColor: LightTheme.background,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      body: SafeArea(
+        bottom: false,
+        child: Consumer<GudangProvider>(
+          builder: (context, provider, child) {
+            return RefreshIndicator(
+              onRefresh: () => provider.fetchTugas(),
+              color: LightTheme.primary,
+              backgroundColor: LightTheme.surface,
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+                slivers: [
+                  
+                  if (provider.isLoading && provider.tugasList.isEmpty)
+                    const SliverFillRemaining(
+                      child: Center(child: CircularProgressIndicator(color: LightTheme.primary)),
+                    )
+                  else if (provider.errorMessage != null && provider.tugasList.isEmpty)
+                    SliverFillRemaining(
+                      child: Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.error_outline_rounded, size: 48, color: const Color(0xFFEF4444)),
+                            const SizedBox(height: 16),
+                            Text(provider.errorMessage!, style: const TextStyle(color: const Color(0xFFEF4444))),
+                            const SizedBox(height: 16),
+                            ElevatedButton(onPressed: () => provider.fetchTugas(), child: const Text('Coba Lagi')),
+                          ],
+                        ),
+                      ),
+                    )
+                  else
+                    SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+                      sliver: provider.tugasList.isEmpty
+                          ? SliverToBoxAdapter(
+                              child: const EmptyStateWidget(
+                                icon: Icons.inventory_2_outlined,
+                                title: 'Semua tugas selesai! 🎉',
+                                subtitle: 'Tarik ke bawah untuk mengecek tugas baru',
+                              ),
+                            )
+                          : SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) => _buildPackingCard(provider.tugasList[index])
+                                    .animate()
+                                    .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
+                                    .slideY(begin: 0.05, end: 0, duration: 400.ms),
+                                childCount: provider.tugasList.length,
+                              ),
+                            ),
+                    ),
                 ],
               ),
             );
-          }
-
-          return RefreshIndicator(
-            onRefresh: () => provider.fetchTugas(),
-            color: AppColors.primary,
-            backgroundColor: AppColors.surface,
-            child: provider.tugasList.isEmpty
-                ? const EmptyStateWidget(
-                    icon: Icons.inventory_2_outlined,
-                    title: 'Semua tugas selesai! 🎉',
-                    subtitle: 'Tarik ke bawah untuk mengecek tugas baru',
-                  )
-                : ListView.builder(
-                    physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-                    itemCount: provider.tugasList.length,
-                    itemBuilder: (context, index) => _buildPackingCard(provider.tugasList[index])
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
-                        .slideY(begin: 0.05, end: 0, duration: 400.ms),
-                  ),
-          );
-        },
+          },
+        ),
       ),
     );
   }
 
+  
+  
   Widget _buildPackingCard(GudangModel item) {
     bool isDone = item.statusPengiriman == 'Siap Dikirim' ||
         item.statusPengiriman == 'Dalam Perjalanan' ||
@@ -144,11 +167,11 @@ class _PackingScreenState extends State<PackingScreen> {
       padding: const EdgeInsets.all(20),
       decoration: isDone
           ? BoxDecoration(
-              color: AppColors.success.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(AppRadius.lg),
-              border: Border.all(color: AppColors.success.withValues(alpha: 0.15)),
+              color: LightTheme.success.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: LightTheme.success.withValues(alpha: 0.15)),
             )
-          : AppGlass.elevatedCard(radius: AppRadius.lg),
+          : BoxDecoration(color: LightTheme.surface, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 4))], border: Border.all(color: LightTheme.border)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -161,7 +184,7 @@ class _PackingScreenState extends State<PackingScreen> {
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w800,
-                    color: isDone ? AppColors.textTertiary : AppColors.textPrimary,
+                    color: isDone ? LightTheme.textTertiary : LightTheme.textPrimary,
                     decoration: isDone ? TextDecoration.lineThrough : null,
                   ),
                 ),
@@ -171,7 +194,7 @@ class _PackingScreenState extends State<PackingScreen> {
           ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 14),
-            child: Divider(height: 1, color: AppColors.borderLight),
+            child: Divider(height: 1, color: LightTheme.border),
           ),
           _buildInfoRow(Icons.inventory_2_outlined, "Barang:", "[${item.kodeBarang}] ${item.namaBarang}", isDone),
           const SizedBox(height: 8),
@@ -191,9 +214,9 @@ class _PackingScreenState extends State<PackingScreen> {
                 style: const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3),
               ),
               style: ElevatedButton.styleFrom(
-                backgroundColor: isDone ? AppColors.success : AppColors.primary,
-                foregroundColor: isDone ? Colors.white : AppColors.textOnPrimary,
-                disabledBackgroundColor: AppColors.success.withValues(alpha: 0.7),
+                backgroundColor: isDone ? LightTheme.success : LightTheme.primary,
+                foregroundColor: isDone ? Colors.white : Colors.white,
+                disabledBackgroundColor: LightTheme.success.withValues(alpha: 0.7),
                 disabledForegroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 14),
               ),
@@ -210,16 +233,16 @@ class _PackingScreenState extends State<PackingScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 16, color: AppColors.textTertiary),
+          child: Icon(icon, size: 16, color: LightTheme.textTertiary),
         ),
         const SizedBox(width: 8),
-        Text("$label ", style: TextStyle(fontSize: 13, color: AppColors.textTertiary, fontWeight: FontWeight.w500)),
+        Text("$label ", style: TextStyle(fontSize: 13, color: LightTheme.textTertiary, fontWeight: FontWeight.w500)),
         Expanded(
           child: Text(
             value,
             style: TextStyle(
               fontSize: 13,
-              color: isDone ? AppColors.textTertiary : AppColors.textPrimary,
+              color: isDone ? LightTheme.textTertiary : LightTheme.textPrimary,
               fontWeight: isBold ? FontWeight.w800 : FontWeight.w600,
             ),
           ),

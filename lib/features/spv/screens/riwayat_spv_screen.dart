@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../providers/admin_provider.dart';
+import '../providers/spv_provider.dart';
 import '../../../shared/theme/light_theme.dart';
 import '../../../shared/widgets/empty_state_widget.dart';
 
-class RiwayatPemeriksaanScreen extends StatefulWidget {
-  const RiwayatPemeriksaanScreen({super.key});
+class RiwayatSpvScreen extends StatefulWidget {
+  final String idSpv;
+  const RiwayatSpvScreen({super.key, required this.idSpv});
 
   @override
-  State<RiwayatPemeriksaanScreen> createState() => _RiwayatPemeriksaanScreenState();
+  State<RiwayatSpvScreen> createState() => _RiwayatSpvScreenState();
 }
 
-class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
+class _RiwayatSpvScreenState extends State<RiwayatSpvScreen> {
   String? _selectedFilter;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<AdminProvider>().fetchRiwayat();
+      context.read<SpvProvider>().fetchRiwayat(widget.idSpv);
     });
   }
 
@@ -28,12 +29,12 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
     return Scaffold(
       backgroundColor: LightTheme.background,
       appBar: AppBar(
-        title: const Text('Lacak Paket', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w700)),
+        title: const Text('Riwayat Antrean', style: TextStyle(color: LightTheme.textPrimary, fontWeight: FontWeight.w700)),
         backgroundColor: LightTheme.background,
         elevation: 0,
-        iconTheme: const IconThemeData(color: LightTheme.textPrimary),
+        // centerTitle dihilangkan agar seragam
       ),
-      body: Consumer<AdminProvider>(
+      body: Consumer<SpvProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading && provider.riwayatList.isEmpty) {
             return const Center(child: CircularProgressIndicator(color: LightTheme.primary));
@@ -49,7 +50,7 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                   Text(provider.errorMessage!, style: const TextStyle(color: LightTheme.warning)),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: () => provider.fetchRiwayat(), 
+                    onPressed: () => provider.fetchRiwayat(widget.idSpv), 
                     style: ElevatedButton.styleFrom(backgroundColor: LightTheme.primary),
                     child: const Text('Coba Lagi', style: TextStyle(color: LightTheme.surface)),
                   ),
@@ -60,14 +61,18 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
 
           final listRiwayat = provider.riwayatList;
           final String currentFilter = _selectedFilter ?? 'Semua';
-          final List<String> filters = ['Semua', 'Lengkap', 'Rusak'];
+          final List<String> filters = ['Semua', 'Lengkap', 'Kurang', 'Rusak'];
           
           int totalLengkap = 0;
+          int totalKurang = 0;
           int totalRusak = 0;
+          
           for (var item in listRiwayat) {
             String status = (item['status_pemeriksaan'] ?? '').toString().toLowerCase();
             if (status.contains('lengkap') || status.contains('bagus')) {
               totalLengkap++;
+            } else if (status.contains('kurang')) {
+              totalKurang++;
             } else if (status.contains('rusak')) {
               totalRusak++;
             }
@@ -78,12 +83,13 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
             : listRiwayat.where((item) {
                 String status = (item['status_pemeriksaan'] ?? '').toString().toLowerCase();
                 if (currentFilter == 'Lengkap') return status.contains('lengkap') || status.contains('bagus');
+                if (currentFilter == 'Kurang') return status.contains('kurang');
                 if (currentFilter == 'Rusak') return status.contains('rusak');
                 return true;
               }).toList();
 
           return RefreshIndicator(
-            onRefresh: () => provider.fetchRiwayat(),
+            onRefresh: () => provider.fetchRiwayat(widget.idSpv),
             color: LightTheme.primary,
             backgroundColor: LightTheme.surface,
             child: CustomScrollView(
@@ -104,7 +110,7 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Ringkasan Paket', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
+                          const Text('Statistik Pemeriksaan', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: LightTheme.textPrimary)),
                           const SizedBox(height: 16),
                           Row(
                             children: [
@@ -115,13 +121,13 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text('${listRiwayat.length}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.surface)),
-                                      const Text('Total', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.surface)),
+                                      Text('$totalLengkap', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.surface)),
+                                      const Text('Lengkap', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.surface)),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -129,13 +135,13 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
-                                      Text('$totalLengkap', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.primary)),
-                                      const Text('Lengkap', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.primary)),
+                                      Text('$totalKurang', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800, color: LightTheme.primary)),
+                                      const Text('Kurang', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: LightTheme.primary)),
                                     ],
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              const SizedBox(width: 8),
                               Expanded(
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -199,13 +205,16 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
                   )
                 else
                   SliverPadding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 100), // padding bottom for fab
                     sliver: SliverList(
                       delegate: SliverChildBuilderDelegate(
-                        (context, index) => _buildRiwayatCard(filtered[index])
-                            .animate()
-                            .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 80))
-                            .slideY(begin: 0.05, end: 0, duration: 400.ms),
+                        (context, index) {
+                          final item = filtered[index];
+                          return _buildRiwayatCard(item)
+                              .animate()
+                              .fadeIn(duration: 400.ms, delay: Duration(milliseconds: index * 50))
+                              .slideY(begin: 0.05, end: 0, duration: 400.ms);
+                        },
                         childCount: filtered.length,
                       ),
                     ),
@@ -219,12 +228,13 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
   }
 
   Widget _buildRiwayatCard(Map<String, dynamic> item) {
-    final status = item['status_pemeriksaan'] ?? 'Unknown';
-    final int bagus = int.tryParse(item['jumlah_bagus'].toString()) ?? 0;
-    final int rusak = int.tryParse(item['jumlah_rusak'].toString()) ?? 0;
-    final int datang = int.tryParse(item['jumlah_datang'].toString()) ?? 1;
-    final double progress = datang > 0 ? (bagus / datang).clamp(0.0, 1.0) : 0.0;
-    final progressColor = progress > 0.8 ? LightTheme.success : LightTheme.warning;
+    final status = (item['status_pemeriksaan'] ?? '').toString();
+    final isRusak = status.toLowerCase() == 'rusak';
+    final isKurang = status.toLowerCase() == 'kurang';
+    
+    Color statusColor = LightTheme.success;
+    if (isRusak) statusColor = const Color(0xFFEF4444);
+    if (isKurang) statusColor = LightTheme.warning;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -239,7 +249,7 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
             children: [
               Expanded(
                 child: Text(
-                  "[${item['kode_barang']}] ${item['nama_barang']}",
+                  "[${item['kode_barang'] ?? '-'}] ${item['nama_barang'] ?? '-'}",
                   style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: LightTheme.textPrimary, height: 1.3),
                 ),
               ),
@@ -247,10 +257,14 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: LightTheme.primary.withValues(alpha: 0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: statusColor.withValues(alpha: 0.2)),
                 ),
-                child: Text(status, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: LightTheme.primary)),
+                child: Text(
+                  status.toUpperCase(),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: statusColor, letterSpacing: 0.5),
+                ),
               ),
             ],
           ),
@@ -258,75 +272,52 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
             padding: EdgeInsets.symmetric(vertical: 16),
             child: Divider(height: 1, color: LightTheme.border),
           ),
-          _buildInfoRow(Icons.person_outline_rounded, 'Pemeriksa:', item['nama_spv'] ?? '-'),
-          const SizedBox(height: 8),
-          _buildInfoRow(Icons.calendar_today_rounded, 'Tanggal:', item['tanggal_pemeriksaan'] ?? '-'),
-          const SizedBox(height: 20),
-
-          // Progress bar 
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Kondisi Barang', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: LightTheme.textSecondary)),
-                  Text(
-                    '${(progress * 100).toInt()}% Bagus',
-                    style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: progressColor),
-                  ),
-                ],
+              Expanded(
+                child: _buildMetricItem(
+                  icon: Icons.inventory_2_outlined,
+                  label: "Tiba",
+                  value: "${item['jumlah_datang'] ?? 0}",
+                  color: const Color(0xFF3B82F6),
+                ),
               ),
-              const SizedBox(height: 8),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: progress,
-                  backgroundColor: LightTheme.surfaceVariant,
-                  valueColor: AlwaysStoppedAnimation<Color>(progressColor),
-                  minHeight: 6,
+              Expanded(
+                child: _buildMetricItem(
+                  icon: Icons.check_circle_outline_rounded,
+                  label: "Bagus",
+                  value: "${item['jumlah_bagus'] ?? 0}",
+                  color: LightTheme.success,
+                ),
+              ),
+              Expanded(
+                child: _buildMetricItem(
+                  icon: Icons.cancel_outlined,
+                  label: "Rusak",
+                  value: "${item['jumlah_rusak'] ?? 0}",
+                  color: const Color(0xFFEF4444),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-
-          // Metrics row
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-            decoration: BoxDecoration(
-              color: LightTheme.primary.withValues(alpha: 0.05),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildMetric('Diharapkan', datang.toString(), LightTheme.textSecondary),
-                _buildMetric('Bagus', bagus.toString(), LightTheme.success),
-                _buildMetric('Rusak', rusak.toString(), rusak > 0 ? const Color(0xFFEF4444) : LightTheme.textTertiary),
-              ],
-            ),
-          ),
-
-          if (item['catatan'] != null && item['catatan'].toString().trim().isNotEmpty) ...[
+          if (item['catatan'] != null && item['catatan'].toString().isNotEmpty) ...[
             const SizedBox(height: 16),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFFFFBEB), // Light yellow
+                color: LightTheme.surfaceVariant,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFFEF3C7)),
               ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(Icons.info_outline_rounded, size: 16, color: Color(0xFFD97706)),
+                  const Icon(Icons.sticky_note_2_outlined, size: 16, color: LightTheme.textTertiary),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      "Catatan: ${item['catatan']}",
-                      style: const TextStyle(fontSize: 12, color: Color(0xFFB45309), fontWeight: FontWeight.w500, height: 1.4),
+                      item['catatan'].toString(),
+                      style: const TextStyle(fontSize: 12, color: LightTheme.textSecondary, height: 1.4),
                     ),
                   ),
                 ],
@@ -338,26 +329,18 @@ class _RiwayatPemeriksaanScreenState extends State<RiwayatPemeriksaanScreen> {
     );
   }
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
+  Widget _buildMetricItem({required IconData icon, required String label, required String value, required Color color}) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, size: 16, color: LightTheme.textTertiary),
-        const SizedBox(width: 10),
-        Text("$label ", style: const TextStyle(fontSize: 12, color: LightTheme.textSecondary, fontWeight: FontWeight.w500)),
-        Expanded(
-          child: Text(value, style: const TextStyle(fontSize: 12, color: LightTheme.textPrimary, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis),
+        Icon(icon, size: 16, color: color),
+        const SizedBox(width: 6),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(label, style: const TextStyle(fontSize: 10, color: LightTheme.textSecondary, fontWeight: FontWeight.w600)),
+            Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, color: color)),
+          ],
         ),
-      ],
-    );
-  }
-
-  Widget _buildMetric(String label, String value, Color valueColor) {
-    return Column(
-      children: [
-        Text(label, style: const TextStyle(fontSize: 11, color: LightTheme.textTertiary, fontWeight: FontWeight.w600)),
-        const SizedBox(height: 4),
-        Text(value, style: TextStyle(fontSize: 16, color: valueColor, fontWeight: FontWeight.w800)),
       ],
     );
   }

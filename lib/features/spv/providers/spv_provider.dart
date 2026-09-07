@@ -13,6 +13,24 @@ class SpvProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
+    List<Map<String, dynamic>> _riwayatList = [];
+  List<Map<String, dynamic>> get riwayatList => _riwayatList;
+
+  Future<void> fetchRiwayat(String idSpv) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _riwayatList = await _repository.fetchRiwayat(idSpv);
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> fetchAntrean() async {
     _isLoading = true;
     _errorMessage = null;
